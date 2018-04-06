@@ -1,0 +1,42 @@
+* UUID generation from serial integers
+
+** Problem
+   Our legacy system (SQL) is the current authority on surrogate key generation.  Moving to a distributed system (Kafka)
+   serial number generation is no longer viable.  A mechanism is needed to convert serial numbers into UUIDs suitable for
+   Kafka.  Ideally, two functions.
+
+#+BEGIN_EXAMPLE
+f:int -> Guid
+f:Guid -> int (or nil)
+#+END_EXAMPLE
+
+** Solution #1
+   Compose a Guid (16 bytes) with 12 of the bytes deterministically generated with the int as a
+   seed, and 4 of the bytes from the original integer id.  These 4 bytes can be inserted into an
+   appropriate place in the GUID according to the spec.  The variant bits can be set to indicate
+   this GUID is of own type.
+
+*** Pros
+    - Easy bi-directional conversion from GUID <-> int.
+
+*** Cons
+    - "Hot spots" of clustered GUIDs around the oringal serial integers.
+    - This could increase the likelihood of collision?
+
+** Solution #2
+   Same #1 but simply zero out all the bytes not a part of th original int.
+   This is probably better than #1 since it has all the same pros and cons, but less machinery.
+
+*** Pro (not in above)
+    The origin of these GUIDs is easily human recognizable.
+
+** Solution #3
+   Same as #1, but pass the integer through a symmetric hashing algorithm to randomize the bytes and avoid creating hot spots
+   in the UUID space.
+ 
+*** Pros
+    - Less likelihood of collisions
+
+*** Cons
+    - More machinery needed, probably a shared key to do symmetric encryption is needed.
+
