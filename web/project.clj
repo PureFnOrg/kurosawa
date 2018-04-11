@@ -11,7 +11,7 @@
                  [org.slf4j/log4j-over-slf4j "1.7.25"]
                  [com.fzakaria/slf4j-timbre "0.3.5"]
 
-                 [org.purefn/kurosawa.log "0.1.0-SNAPSHOT"]]
+                 [org.purefn/kurosawa.log "0.1.0"]]
   :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
                                   [com.stuartsierra/component.repl "0.2.0"]]
                    :source-paths ["dev"]}})
