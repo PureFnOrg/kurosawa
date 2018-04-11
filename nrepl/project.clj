@@ -3,6 +3,7 @@
   :url "https://github.com/PureFnOrg/kurosawa"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :scm {:dir ".."}
   :dependencies [[org.clojure/clojure "1.9.0-alpha16"]
                  [com.stuartsierra/component "0.3.2"]
                  [com.taoensso/timbre "4.10.0"]
