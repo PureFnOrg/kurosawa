@@ -1,6 +1,6 @@
 (defproject org.purefn/kurosawa.web "0.1.0-SNAPSHOT"
   :description "The Kurosawa web library."
-  :url "https://github.com/TheLadders/kurosawa"
+  :url "https://github.com/PureFnOrg/kurosawa"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.9.0-alpha16"]
