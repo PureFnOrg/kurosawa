@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.core "0.1.0-SNAPSHOT"
+(defproject org.purefn/kurosawa.core "0.1.0"
   :description "The root Kurosawa library."
   :url "https://github.com/PureFnOrg/kurosawa"
   :license {:name "Eclipse Public License"

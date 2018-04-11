@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.log "0.1.0-SNAPSHOT"
+(defproject org.purefn/kurosawa.log "0.1.0"
   :description "A Kurosawa library for logging."
   :url "https://github.com/PureFnOrg/kurosawa"
   :license {:name "Eclipse Public License"
