@@ -2,14 +2,19 @@
   "Cider nREPL server component."
   (:require [clojure.spec.alpha :as s]
             [clojure.tools.nrepl.server :as repl]
-            [cider.nrepl :as cider]
             [com.stuartsierra.component :as component]
-            [refactor-nrepl.middleware]
             [taoensso.timbre :as log]))
 
 ;;------------------------------------------------------------------------------
 ;; Component. 
 ;;------------------------------------------------------------------------------
+
+;; see https://github.com/clojure-emacs/cider-nrepl#via-embedding-nrepl-in-your-app
+;; for an explanation of this hack.
+
+(defn- nrepl-handler []
+  (require 'cider.nrepl)
+  (ns-resolve 'cider.nrepl 'cider-nrepl-handler))
 
 (defrecord CiderReplServer
     [config server]
@@ -21,13 +26,9 @@
         (log/info "CiderReplServer already started on port" (::port config))
         this)
       (let [port (::port config)
-            middleware (->> cider/cider-middleware
-                            (cons 'refactor-nrepl.middleware/wrap-refactor)
-                            (map resolve))
             _ (log/info "Starting CiderReplServer on port" port)
             srv (repl/start-server :port port
-                                   :handler (apply repl/default-handler
-                                                   middleware))]
+                                   :handler (nrepl-handler))]
         (assoc this :server srv))))
   (stop [this]
     (if server
@@ -52,7 +53,6 @@
    `repl` if not provided."
   ([name] {::port 7888})
   ([] (default-config "repl")))
-
 
 ;;------------------------------------------------------------------------------
 ;; Creation.
