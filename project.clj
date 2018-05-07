@@ -25,7 +25,6 @@
              :inherited {:min-lein-version "2.7.1"
                          :aliases      {"all" ^:displace ["do" "clean," "test," "install"]
                                         "-f" ["with-profile" "+fast"]}
-                         :scm {:dir ".."}
                          :license {:name "Apache Software License - v 2.0"
                                    :url "http://www.apache.org/licenses/LICENSE-2.0"}
                          :deploy-repositories
