@@ -20,14 +20,16 @@
 
   :aliases {"project-version" ["run" "-m" "org.purefn.kurosawa.version"]}
 
-  :modules  {;;:subprocess nil
+  :modules  {:subprocess nil
              
              :inherited {:min-lein-version "2.7.1"
                          :aliases      {"all" ^:displace ["do" "clean," "test," "install"]
                                         "-f" ["with-profile" "+fast"]}
                          :scm {:dir ".."}
                          :license {:name "Apache Software License - v 2.0"
-                                   :url "http://www.apache.org/licenses/LICENSE-2.0"}}
+                                   :url "http://www.apache.org/licenses/LICENSE-2.0"}
+                         :deploy-repositories
+                         [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]}
              
              :versions {org.clojure/clojure             "1.9.0"
                         com.taoensso/timbre             "4.10.0"
@@ -36,4 +38,15 @@
                         org.clojure/test.check          "0.9.0"
                         com.gfredericks/test.chuck      "0.2.7"
                         org.clojure/tools.namespace     "0.2.11"
-                        org.purefn/kurosawa.log         :version}})
+                        org.purefn/kurosawa.log         :version}}
+
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version" "leiningen.release/bump-version" "release"]
+                  ["modules" "change" "version" "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag"]
+                  ["modules" "deploy"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["modules" "change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]])
