@@ -1,5 +1,5 @@
 (defproject org.purefn/kurosawa-suite "2.0.0-SNAPSHOT"
-  :description "Parent for all that is Immutant"
+  :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
   :profiles {:provided {:dependencies [[org.clojure/clojure _]]}
@@ -18,10 +18,7 @@
                               :exclusions [org.clojure/clojure]]
                              [lein-ancient "0.6.10"]]}}
 
-  :aliases {"docs-from-index" ["build-helper" "docs" "generate" "docs/guides"
-                               "caching" "core" "messaging" "scheduling" "transactions" "web" "wildfly"]
-            "docs" ["do" "modules" "doc-index" "," "docs-from-index"]
-            "project-version" ["run" "-m" "org.purefn.kurosawa.version"]}
+  :aliases {"project-version" ["run" "-m" "org.purefn.kurosawa.version"]}
 
   :modules  {;;:subprocess nil
              
@@ -32,7 +29,7 @@
                          :license {:name "Apache Software License - v 2.0"
                                    :url "http://www.apache.org/licenses/LICENSE-2.0"}}
              
-             :versions {org.clojure/clojure             "1.9.0-alpha16"
+             :versions {org.clojure/clojure             "1.9.0"
                         com.taoensso/timbre             "4.10.0"
                         com.stuartsierra/component      "0.3.2"
                         com.stuartsierra/component.repl "0.2.0"
