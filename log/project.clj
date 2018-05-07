@@ -1,11 +1,7 @@
-(defproject org.purefn/kurosawa.log "0.1.0"
+(defproject org.purefn/kurosawa.log "2.0.0-SNAPSHOT"
+  :plugins [[lein-modules "0.3.11"]]
   :description "A Kurosawa library for logging."
-  :url "https://github.com/PureFnOrg/kurosawa"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.9.0-alpha16"]
-                 [com.taoensso/timbre "4.10.0"]]
-    :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
-                                    [com.stuartsierra/component "0.3.2"]
-                                    [com.stuartsierra/component.repl "0.2.0"]]
-                   :source-paths ["dev"]}})
+  :dependencies [[com.taoensso/timbre _]]
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace _]
+                                  [com.stuartsierra/component _]
+                                  [com.stuartsierra/component.repl _]]}})
