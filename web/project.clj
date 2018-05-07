@@ -1,4 +1,5 @@
-(defproject org.purefn/kurosawa.web "0.2.0-SNAPSHOT"
+(defproject org.purefn/kurosawa.web "2.0.0-SNAPSHOT"
+  :plugins [[lein-modules "0.3.11"]]
   :description "The Kurosawa web library."
   :dependencies [[org.clojure/clojure _]
                  [com.stuartsierra/component _]
@@ -8,4 +9,4 @@
                  [org.slf4j/log4j-over-slf4j "1.7.25"]
                  [com.fzakaria/slf4j-timbre "0.3.5"]
 
-                 [org.purefn/kurosawa.log :version]])
+                 [org.purefn/kurosawa.log _]])
