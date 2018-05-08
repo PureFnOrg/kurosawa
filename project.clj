@@ -27,11 +27,10 @@
                                         "-f" ["with-profile" "+fast"]}
                          :license {:name "Apache Software License - v 2.0"
                                    :url "http://www.apache.org/licenses/LICENSE-2.0"}
+                         :url "https://github.com/PureFnOrg/kurosawa"
                          :deploy-repositories
                          [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]}
 
-             :url "https://github.com/PureFnOrg/kurosawa"
-             
              :versions {org.clojure/clojure             "1.9.0"
                         com.taoensso/timbre             "4.10.0"
                         com.stuartsierra/component      "0.3.2"
