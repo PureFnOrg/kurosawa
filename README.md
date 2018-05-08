@@ -46,3 +46,8 @@ Try out the results namespace:
 Check-ins to the `k8s-qa` or `k8s-prod` branches will trigger Jenkins to build a JAR artifact
 for the library and deploying it to Nexus on the respective clusters.
 
+## License
+
+Copyright © 2018 Ladders, PureFn
+
+Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.

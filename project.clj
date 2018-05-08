@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa-suite "2.0.0-SNAPSHOT"
+(defproject org.purefn/kurosawa "2.0.0-SNAPSHOT"
   :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
@@ -29,6 +29,8 @@
                                    :url "http://www.apache.org/licenses/LICENSE-2.0"}
                          :deploy-repositories
                          [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]}
+
+             :url "https://github.com/PureFnOrg/kurosawa"
              
              :versions {org.clojure/clojure             "1.9.0"
                         com.taoensso/timbre             "4.10.0"
