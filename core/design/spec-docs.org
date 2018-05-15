@@ -1,0 +1,69 @@
+* Docs on spec
+
+One major (and somewhat inexplicable) shortcoming of Clojure's spec
+library is the inability to attach any kind of documentation to specs,
+even though there's a global spec registry that seems ideal for such a
+feature. Admittedly, specs are meant to be understandable as code, but
+let's face it: if you're looking at a bunch of interrelated specs
+trying to figure out what's what, it's not an easy job.
+
+Not only that, but it's quite labor-intensive. For most types of
+source artifacts, your IDE can help you out quite a bit. Whehter it's
+allowing jumping around to definitions, or popping up tooltips with
+the documentation that is available, or pulling up arbitrary
+docstrings, there's lots of nice ways to navigate yourself around and
+figure out what's what. Not so with specs!
+
+Fortunately, we don't have to be bound by this limitation. We can add
+our own docs on specs feature.
+
+** The proposal
+
+Since Kurosawa is at the center of our services architecture, it's a
+great place to add a cross-cutting feature like spec documentation.
+
+We'll add a custom spec registry to Kurosawa that will hold the
+documentation for each registered spec, and provide convenient ways to
+access it.
+
+The proposed API:
+
+#+begin_src clojure
+  (defmacro register
+    "Registers a spec with given docstring. Also calls out clojure's
+     spec registry to register the spec, if name is registerable."
+    [name doc spec])
+
+  (defn doc
+    "Returns the docstring for a given spec name."
+    [name])
+
+  (defn registry
+    "Returns the registry map, keyed by spec name, with document metadat
+     on each spec."
+    [])
+
+  (defn lookup
+    "Wraps Clojure spec's lookup function, but the returned spec will
+     have the docstring as metadata."
+    [name])
+
+  (defn namespace-specs
+    "Returns a collection of all the specs for a given namespace - in
+     other words, the specs that have keyword names and the keyword is
+     in the given namespace. Each will have their docstring as
+     metadata."
+    [ns])
+#+end_src
+
+** Alternatives
+
+We could manually add metadata to specs with documentation and other
+things.
+
+We could sign CA's and try to get this functionality into Clojure spec
+proper (ha ha).
+
+This functionality could stay in Irulan.
+
+We could keep doing nothing and just put comments in the source.
