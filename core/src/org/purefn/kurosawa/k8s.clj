@@ -35,6 +35,7 @@
                             (str/trim))]
                   [(drop n p)
                    (-> (attempt (fn [^String s] (Integer. s)) v)
+                       (recover (fn [_] (Long. v)))
                        (recover (fn [_] (Double. v)))
                        (recover (constantly v))
                        (success))]))]
