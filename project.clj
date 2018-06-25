@@ -29,7 +29,7 @@
                                    :url "http://www.apache.org/licenses/LICENSE-2.0"}
                          :url "https://github.com/PureFnOrg/kurosawa"
                          :deploy-repositories
-                         [["releases" {:url "https://clojars.org/repo/"}]]}
+                         [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]}
 
              :versions {org.clojure/clojure             "1.9.0"
                         com.taoensso/timbre             "4.10.0"
