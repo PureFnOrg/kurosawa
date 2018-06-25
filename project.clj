@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa "2.0.2"
+(defproject org.purefn/kurosawa "2.0.3-SNAPSHOT"
   :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
@@ -38,7 +38,10 @@
                         org.clojure/test.check          "0.9.0"
                         com.gfredericks/test.chuck      "0.2.7"
                         org.clojure/tools.namespace     "0.2.11"
-                        org.purefn/kurosawa.log         :version}}
+                        org.purefn/kurosawa.log         :version
+                        org.purefn/kurosawa.core        :version
+                        org.purefn/kurosawa.web         :version
+                        org.purefn/kurosawa.nrepl       :version}}
 
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
