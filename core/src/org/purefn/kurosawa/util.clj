@@ -91,6 +91,20 @@
   [apply-fn revert-fn]
   (juxt apply-fn (constantly revert-fn)))
 
+(defmacro defprinter
+  "Overrides the print methods of class `c` with function `f`.
+
+  Useful for avoiding the printing of large `defrecord`s in logs and the REPL."
+  [c f]
+  `(do
+     (defmethod print-method ~c [c# w#]
+       (print-simple (~f c#) w#))
+
+     (defmethod print-dup ~c [c# w#]
+       (print-simple (~f c#) w#))
+
+     (defmethod pprint/simple-dispatch ~c [c#]
+       (.write *out* (~f c#)))))
 
 ;;------------------------------------------------------------------------------
 ;; Specs
