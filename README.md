@@ -43,8 +43,9 @@ Try out the results namespace:
 
 ## Deploying 
 
-Check-ins to the `k8s-qa` or `k8s-prod` branches will trigger Jenkins to build a JAR artifact
-for the library and deploying it to Nexus on the respective clusters.
+	lein release :patch
+	
+or similar will release to clojars.
 
 ## License
 
