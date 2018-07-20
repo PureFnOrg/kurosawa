@@ -1,6 +1,7 @@
 (ns org.purefn.kurosawa.util
   "Miscellaneous utility functions."
-  (:require [clojure.spec.alpha :as s]
+  (:require [clojure.pprint :as pprint]
+            [clojure.spec.alpha :as s]
             [taoensso.timbre :as log]))
 
 (defn flip
