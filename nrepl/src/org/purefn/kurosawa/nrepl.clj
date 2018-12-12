@@ -1,7 +1,7 @@
 (ns org.purefn.kurosawa.nrepl
   "Cider nREPL server component."
   (:require [clojure.spec.alpha :as s]
-            [clojure.tools.nrepl.server :as repl]
+            [nrepl.server :as repl]
             [com.stuartsierra.component :as component]
             [taoensso.timbre :as log]))
 
