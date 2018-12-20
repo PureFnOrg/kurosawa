@@ -26,8 +26,9 @@
         (log/info "CiderReplServer already started on port" (::port config))
         this)
       (let [port (::port config)
-            _ (log/info "Starting CiderReplServer on port" port)
+            _ (log/info "Starting CiderReplServer on port" port "and bind to localhost")
             srv (repl/start-server :port port
+                                   :bind "localhost"
                                    :handler (nrepl-handler))]
         (assoc this :server srv))))
   (stop [this]
