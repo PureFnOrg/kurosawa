@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.web "2.0.9-SNAPSHOT"
+(defproject org.purefn/kurosawa.web "2.0.9"
   :plugins [[lein-modules "0.3.11"]]
   :description "The Kurosawa web library."
   :dependencies [[org.clojure/clojure _]
