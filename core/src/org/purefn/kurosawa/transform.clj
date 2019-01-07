@@ -36,3 +36,31 @@
    (map #(clojure.lang.MapEntry. (key %) (f (val %)))))
   ([f m]
    (into {} (map (juxt key (comp f val))) m)))
+
+(defn distinct-by
+  "Like distinct, but calls f on each item to determine the distinct
+   value, while returning the original un-transformed item. Returns a
+   transducer if called without a collection argument."
+  ([f]
+   (fn [rf]
+     (let [seen (volatile! #{})]
+       (fn
+         ([] (rf))
+         ([result] (rf result))
+         ([result input]
+          (let [d-val (f input)]
+            (if (contains? @seen d-val)
+              result
+              (do (vswap! seen conj d-val)
+                  (rf result input)))))))))
+  ([f coll]
+   (let [step (fn step [xs seen]
+                (lazy-seq
+                 ((fn [[x :as xs] seen]
+                    (when-let [s (seq xs)]
+                      (let [d-val (f x)]
+                        (if (contains? seen d-val)
+                          (recur (rest s) seen)
+                          (cons x (step (rest s) (conj seen d-val)))))))
+                  xs seen)))]
+     (step coll #{}))))
