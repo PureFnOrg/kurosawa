@@ -10,6 +10,10 @@
        (map (comp keyword (memfn getName)))))
 
 (defn register
-  [type kw]
-  (swap! registry-ref assoc kw {:type type
-                                :dependencies (record-fields type)}))
+  [type factory-fn kw & {:keys [config]}]
+  (let [config-fn (or config
+                      (resolve (symbol (str (namespace-munge *ns*) "/default-config"))))]
+    (swap! registry-ref assoc kw {:type type
+                                  :factory factory-fn
+                                  :config config-fn
+                                  :dependencies (record-fields type)})))
