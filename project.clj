@@ -2,7 +2,10 @@
   :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
-  :profiles {:provided {:dependencies [[org.clojure/clojure _]]}
+  :profiles {:provided {:dependencies [
+                                       ;; pinning this version here is required for
+                                       ;; refactor-nrepl to start-up
+                                       [org.clojure/clojure "1.10.0"]]}
 
              :dev {:dependencies [[org.clojure/tools.namespace _]
                                   [com.stuartsierra/component.repl _]]
@@ -23,15 +26,15 @@
   :modules  {:subprocess nil
              
              :inherited {:min-lein-version "2.7.1"
-                         :aliases      {"all" ^:displace ["do" "clean," "test," "install"]
-                                        "-f" ["with-profile" "+fast"]}
+                         :aliases {"all" ^:displace ["do" "clean," "test," "install"]
+                                   "-f" ["with-profile" "+fast"]}
                          :license {:name "Apache Software License - v 2.0"
                                    :url "http://www.apache.org/licenses/LICENSE-2.0"}
                          :url "https://github.com/PureFnOrg/kurosawa"
                          :deploy-repositories
                          [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]}
 
-             :versions {org.clojure/clojure             "1.9.0"
+             :versions {org.clojure/clojure             "1.10.0"
                         com.taoensso/timbre             "4.10.0"
                         com.stuartsierra/component      "0.3.2"
                         com.stuartsierra/component.repl "0.2.0"
