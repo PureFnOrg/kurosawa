@@ -2,8 +2,7 @@
   :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
-  :profiles {:provided {:dependencies [
-                                       ;; pinning this version here is required for
+  :profiles {:provided {:dependencies [;; pinning this version here is required for
                                        ;; refactor-nrepl to start-up
                                        [org.clojure/clojure "1.10.0"]]}
 

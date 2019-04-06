@@ -1,4 +1,9 @@
 (ns org.purefn.kurosawa.config
+  "Fetch configuration from the environment.
+
+  Support for fetching configuration from different sources is provided by
+  `fetchers`, a vector of functions, each taking a single string argument
+  and returning a map."
   (:require [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :refer [instrument]]
             [org.purefn.kurosawa.config.file :as file]
@@ -16,6 +21,12 @@
   (reset! fetchers fns))
 
 (defn fetch-config
+  "Attempts to fetch configuration from the sources defined in `fetchers.`
+
+  The default implementation fetches from:
+  1) AWS SSM Parameter Store
+  2) Environment variables
+  3) The filesyetem"
   [name]
   (-> (keep #(% name) @fetchers)
       (first)))

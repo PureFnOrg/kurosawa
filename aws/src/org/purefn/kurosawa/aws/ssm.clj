@@ -3,6 +3,7 @@
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :refer [instrument]]
+            [org.purefn.kurosawa.config.parse :as parse]
             [taoensso.timbre :as log])
   (:import
    [com.amazonaws.services.simplesystemsmanagement
@@ -65,7 +66,8 @@
        (->> (fetch-parameters pfx)
             (map (juxt (comp #(str/replace % pfx "")
                              first)
-                       second))
+                       (comp parse/value
+                             second)))
             (into {})
             ((fn [m] (when (seq m) m))))))
 

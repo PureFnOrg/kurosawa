@@ -11,7 +11,7 @@
 
   'Is the program currently running in a Kubernetes container?'
 
-  This was/is a leaky abstraction, the application shouldn't be concerned with
+  This was a leaky abstraction, the application needn't be concerned with
   where/how it is being run."
   []
   true)

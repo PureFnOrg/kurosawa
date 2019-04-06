@@ -1,8 +1,8 @@
 (ns org.purefn.kurosawa.config.env
-  "Load configuration from the environment.")
+  "Load configuration from environment variables.")
 
 (defn fetch-config
   [name]
-  ;; this method is a stub, for now.
+  ;; this function is a stub, for now.
   )
 

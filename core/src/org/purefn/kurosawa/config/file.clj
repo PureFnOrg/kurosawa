@@ -2,7 +2,7 @@
   "Load configuration from the filesystem."
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
-            [org.purefn.kurosawa.result :refer :all])
+            [org.purefn.kurosawa.config.parse :as parse])
   (:import [java.io File]))
 
 (defn- read-directory
@@ -22,11 +22,7 @@
                         v (-> (slurp fd)
                               (str/trim))]
                     [(drop n p)
-                     (-> (attempt (fn [^String s] (Integer. s)) v)
-                         (recover (fn [_] (Long. v)))
-                         (recover (fn [_] (Double. v)))
-                         (recover (constantly v))
-                         (success))]))]
+                     (parse/value v)]))]
       (->> (tree-seq dir? files root)
            (filter (comp not dir?))
            (map pairs)
