@@ -1,4 +1,5 @@
 (ns org.purefn.kurosawa.aws.ssm
+  "Fetch config from the SSM parameter store."
   (:require [clj-http.client :as http]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]

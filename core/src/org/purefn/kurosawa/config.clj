@@ -12,8 +12,8 @@
             [taoensso.timbre :as log]))
 
 (def ^:private fetchers
-  (atom [ssm/fetch-config
-         env/fetch-config
+  (atom [env/fetch-config
+         ssm/fetch-config
          (partial file/fetch-config "/etc/")]))
 
 (defn set-config-fetchers!
@@ -23,10 +23,10 @@
 (defn fetch-config
   "Attempts to fetch configuration from the sources defined in `fetchers.`
 
-  The default implementation fetches from:
-  1) AWS SSM Parameter Store
-  2) Environment variables
-  3) The filesyetem"
+  The default implementation fetches from (in order):
+  1) Environment variables
+  2) AWS SSM Parameter Store
+  3) Filesyetem"
   [name]
   (-> (keep #(% name) @fetchers)
       (first)))
