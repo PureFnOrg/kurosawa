@@ -24,7 +24,7 @@
   (s/fspec :args (s/cat :s string?)
            :ret (s/nilable map?)))
 
-(s/fdef set-config-fetcher!
+(s/fdef set-config-fetchers!
   :args (s/cat :fns (s/and vector? (s/coll-of ::fetcher))))
 
-(instrument `set-config-fetchers)
+(instrument `set-config-fetchers!)
