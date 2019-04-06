@@ -1,8 +1,7 @@
 (defproject org.purefn/kurosawa.web "2.0.12-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "The Kurosawa web library."
-  :dependencies [[org.clojure/clojure _]
-                 [com.stuartsierra/component _]
+  :dependencies [[com.stuartsierra/component _]
 
                  [org.immutant/web "2.1.7"
                   :exclusions [ch.qos.logback/logback-classic]]

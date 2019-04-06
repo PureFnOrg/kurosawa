@@ -1,5 +1,6 @@
 (ns org.purefn.kurosawa.aws.ssm
   (:require [clj-http.client :as http]
+            [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :refer [instrument]]
             [taoensso.timbre :as log])
@@ -14,15 +15,20 @@
   "Fetches parameters from SSM recursively under the given `path`. Returns a map
   of SSM keys to values."
   [path]
-  (let [req (doto (GetParametersByPathRequest.)
-              (.setPath path)
-              (.setRecursive true)
-              (.setWithDecryption true))
-        resp (-> (AWSSimpleSystemsManagementClientBuilder/defaultClient)
-                 (.getParametersByPath req))]
-    (->> (.getParameters resp)
-         (map (fn [^Parameter p] [(.getName p) (.getValue p)]))
-         (into {}))))
+  (try 
+    (let [req (doto (GetParametersByPathRequest.)
+                (.setPath path)
+                (.setRecursive true)
+                (.setWithDecryption true))
+          resp (-> (AWSSimpleSystemsManagementClientBuilder/defaultClient)
+                   (.getParametersByPath req))]
+      (->> (.getParameters resp)
+           (map (fn [^Parameter p] [(.getName p) (.getValue p)]))
+           (into {})))
+    (catch Exception ex
+      (log/warn "Unable to fetch from SSM Parameter Store!"
+                :path path
+                :message (.getMessage ex)))))
 
 (def ^:private default-prefix-resolver
   ;; current convention
@@ -42,18 +48,30 @@
   (atom [security-group-resolver
          default-prefix-resolver]))
 
-(defn prefix
+(defn- prefix*
   []
   (-> (keep (fn [f] (f)) @prefix-resolvers)
       (first)))
+
+(def prefix (memoize prefix*))
 
 (defn set-prefix-resolvers!
   [fns]
   (reset! prefix-resolvers fns))
 
+(defn fetch-config
+  [name]
+  (let [pfx (str (prefix) name "/")]
+       (->> (fetch-parameters pfx)
+            (map (juxt (comp #(str/replace % pfx "")
+                             first)
+                       second))
+            (into {})
+            ((fn [m] (when (seq m) m))))))
+
 (s/def ::resolver (s/fspec :ret (s/nilable string?)))
 
-(s/fdef set-prefix-resolvers
+(s/fdef set-prefix-resolvers!
   :args (s/cat :fns (s/coll-of ::resolver)))
 
 (instrument `set-prefix-resolvers!)

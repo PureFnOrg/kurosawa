@@ -34,13 +34,13 @@
                          :deploy-repositories
                          [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]}
 
-             :versions {org.clojure/clojure             "1.10.0"
-                        com.taoensso/timbre             "4.10.0"
+             :versions {com.taoensso/timbre             "4.10.0"
                         com.stuartsierra/component      "0.3.2"
                         com.stuartsierra/component.repl "0.2.0"
                         org.clojure/test.check          "0.9.0"
                         com.gfredericks/test.chuck      "0.2.7"
                         org.clojure/tools.namespace     "0.2.11"
+                        org.purefn/kurosawa.aws         :version
                         org.purefn/kurosawa.log         :version
                         org.purefn/kurosawa.core        :version
                         org.purefn/kurosawa.web         :version
