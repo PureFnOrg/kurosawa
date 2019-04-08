@@ -25,11 +25,13 @@
 (compile-if
  (do (require 'org.purefn.kurosawa.aws.ssm)
      true)
+
  (defn- fetch-ssm
    []
    (org.purefn.kurosawa.aws.ssm/fetch
     (or (org.purefn.kurosawa.aws.ssm/prefix-from-env-var)
         "/local/platform")))
+
  (defn- fetch-ssm
    []
    (log/warn "Tried to load org/purefn/kurosawa/aws/ssm.clj but it was"
