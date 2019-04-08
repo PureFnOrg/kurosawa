@@ -2,6 +2,7 @@
   "Fetch configuration from the environment.
 
   Presently, config is stored statefully in an `atom` after initial load."
+  (:refer-clojure :exclude [set])
   (:require [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :refer [instrument]]
             [org.purefn.kurosawa.config.file :as file]

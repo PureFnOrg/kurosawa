@@ -43,9 +43,16 @@
     (catch SocketTimeoutException ex
       (log/info "Timed out fetching EC2 metadata, I'm not running on AWS hardware!"))))
 
+(defn remove-trailing
+  [s c]
+  (if-let [i (str/index-of s c (-> s count dec))]
+    (.substring s 0 i)
+    s))
+
 (defn prefix-from-env-var
   []
-  (System/getenv "AWS_SSM_PREFIX"))
+  (remove-trailing (System/getenv "AWS_SSM_PREFIX")
+                   "/"))
 
 (def ^:private parse
   (some-fn #(try (Integer. %)
