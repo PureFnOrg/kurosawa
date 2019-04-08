@@ -3,13 +3,10 @@
 
   Presently, config is stored statefully in an `atom` after initial load."
   (:refer-clojure :exclude [set])
-  (:require [clojure.spec.alpha :as s]
-            [clojure.spec.test.alpha :refer [instrument]]
+  (:require [org.purefn.kurosawa.config.env :as env]
             [org.purefn.kurosawa.config.file :as file]
-            [org.purefn.kurosawa.config.env :as env]
             [org.purefn.kurosawa.util :refer [compile-if]]
-            [taoensso.timbre :as log])
-  (:import [java.io FileNotFoundException]))
+            [taoensso.timbre :as log]))
 
 (def ^:private config-map
   (atom nil))
