@@ -2,7 +2,6 @@
   "Fetch configuration from the environment.
 
   Presently, config is stored statefully in an `atom` after initial load."
-  (:refer-clojure :exclude [set])
   (:require [org.purefn.kurosawa.config.env :as env]
             [org.purefn.kurosawa.config.file :as file]
             [org.purefn.kurosawa.util :refer [compile-if]]
@@ -11,7 +10,7 @@
 (def ^:private config-map
   (atom nil))
 
-(defn set
+(defn set!
   "Set the `config-map` atom to configuration sourced from the envinronment,
   probably from:
 
