@@ -47,16 +47,14 @@
   []
   (System/getenv "AWS_SSM_PREFIX"))
 
-(defn- parse
-  [s]
-  ((some-fn #(try (Integer. %)
-                  (catch Exception ex))
-            #(try (Long. %)
-                  (catch Exception ex))
-            #(try (Double. %)
-                  (catch Exception ex))
-            identity)
-   s))
+(def ^:private parse
+  (some-fn #(try (Integer. %)
+                 (catch Exception ex))
+           #(try (Long. %)
+                 (catch Exception ex))
+           #(try (Double. %)
+                 (catch Exception ex))
+           identity))
 
 (defn fetch
   [prefix]
