@@ -27,6 +27,7 @@
 
  (defn- fetch-ssm
    []
+   (require 'org.purefn.kurosawa.aws.ssm)
    (org.purefn.kurosawa.aws.ssm/fetch
     (or (org.purefn.kurosawa.aws.ssm/prefix-from-env-var)
         "/local/platform")))
