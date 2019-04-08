@@ -54,7 +54,8 @@
             #(try (Long. %)
                   (catch Exception ex))
             #(try (Double. %)
-                  (catch Exception ex)))
+                  (catch Exception ex))
+            identity)
    s))
 
 (defn fetch
