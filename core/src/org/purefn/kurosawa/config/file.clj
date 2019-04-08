@@ -33,9 +33,9 @@
   (->> (map read-directory dirs)
        (reduce merge)))
 
-(defn fetch-config
-  ([name]
-   (fetch-config "./" name))
-  ([root-dir name]
-   (read-directories (str root-dir "configs/" name)
-                     (str root-dir "secrets/" name))))
+(defn fetch
+  ([]
+   (fetch "./"))
+  ([root-dir]
+   (read-directories (str root-dir "configs/")
+                     (str root-dir "secrets/"))))

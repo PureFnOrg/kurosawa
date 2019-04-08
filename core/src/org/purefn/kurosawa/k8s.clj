@@ -21,7 +21,7 @@
 
   Pass through to `org.purefn.kurosawa.config/fetch-config`"
   ([name]
-   (config/fetch-config name))
+   (config/fetch name))
   ([]
    (config-map "")))
 
@@ -30,6 +30,6 @@
 
   Pass through to `org.purefn.kurosawa.config/fetch-config`"
   ([name]
-   (config/fetch-config name))
+   (config/fetch name))
   ([]
    (secrets "")))

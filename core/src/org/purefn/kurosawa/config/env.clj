@@ -11,7 +11,7 @@
        (str/split #"_")
        (rest))))
 
-(defn- env-variables*
+(defn- env-variables
   []
   (->> (System/getenv)
        (map (juxt (comp str/lower-case key)
@@ -20,20 +20,27 @@
        (group-by (comp first #(str/split % #"_") first))
        (into {})))
 
-(def env-variables (memoize env-variables*))
-
-(defn fetch-config
+(defn fetch
   "Fetches a map from environment variables according to the convention:
 
   * MYSQL_USER=root
   * MYSQL_PASSWORD=secure
   * MYSQL_NUM_THREADS=10
 
-  > (fetch-config mysql)
-  {user root
-   password secure
-   num-threads 10}"
-  [name]
-  (some->> (get (env-variables) name)
-           (map (juxt second (comp parse/value last)))
-           (into {})))
+  > (fetch)
+  {mysql
+   {user root
+    password secure
+    num-threads 10}}"
+  []
+  (->> (System/getenv)
+       (map (juxt (comp str/lower-case key)
+                  (comp munge-name key)
+                  val))
+       (group-by (comp first #(str/split % #"_") first))
+       (map (fn [[k kvs]]
+              [k (->> (map (juxt second
+                                 (comp parse/value last))
+                           kvs)
+                      (into {}))]))
+       (into {})))

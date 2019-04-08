@@ -1,9 +1,7 @@
 (ns org.purefn.kurosawa.config
   "Fetch configuration from the environment.
 
-  Support for fetching configuration from different sources is provided by
-  `fetchers`, a vector of functions, each taking a single string argument
-  and returning a map."
+  Presently, config is stored statefully in an `atom` after initial load."
   (:require [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :refer [instrument]]
             [org.purefn.kurosawa.config.file :as file]
@@ -11,31 +9,28 @@
             [org.purefn.kurosawa.aws.ssm :as ssm]
             [taoensso.timbre :as log]))
 
-(def ^:private fetchers
-  (atom [env/fetch-config
-         ssm/fetch-config
-         (partial file/fetch-config "/etc/")]))
+(def ^:private config-map
+  (atom nil))
 
-(defn set-config-fetchers!
-  [fns]
-  (reset! fetchers fns))
+(defn default-config
+  "This is our default, precendence based, load config from environment
+  mechasnism.  A shallow merge was chosen to make final merged config map easier
+  to reason about."
+  []
+  (merge (file/fetch "etc/")
+         (ssm/fetch (or (ssm/prefix-from-security-group)
+                        "/local/platform"))
+         (env/fetch)))
 
-(defn fetch-config
-  "Attempts to fetch configuration from the sources defined in `fetchers.`
+(defn reset
+  "Reset the `config-map` atom to something other than the default."
+  [m]
+  (reset! config-map m))
 
-  The default implementation fetches from (in order):
-  1) Environment variables
-  2) AWS SSM Parameter Store
-  3) Filesyetem"
-  [name]
-  (-> (keep #(% name) @fetchers)
-      (first)))
-
-(s/def ::fetcher
-  (s/fspec :args (s/cat :s string?)
-           :ret (s/nilable map?)))
-
-(s/fdef set-config-fetchers!
-  :args (s/cat :fns (s/and vector? (s/coll-of ::fetcher))))
-
-(instrument `set-config-fetchers!)
+(defn fetch
+  ([]
+   (if @config-map
+     @config-map
+     (reset! config-map (default-config))))
+  ([name]
+   (get (fetch) name)))
