@@ -23,6 +23,16 @@
 (def env-variables (memoize env-variables*))
 
 (defn fetch-config
+  "Fetches a map from environment variables according to the convention:
+
+  * MYSQL_USER=root
+  * MYSQL_PASSWORD=secure
+  * MYSQL_NUM_THREADS=10
+
+  > (fetch-config mysql)
+  {user root
+   password secure
+   num-threads 10}"
   [name]
   (some->> (get (env-variables) name)
            (map (juxt second (comp parse/value last)))
