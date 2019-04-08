@@ -4,7 +4,6 @@
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :refer [instrument]]
-            [org.purefn.kurosawa.config.parse :as parse]
             [taoensso.timbre :as log])
   (:import
    [com.amazonaws.services.simplesystemsmanagement
@@ -48,6 +47,16 @@
   []
   (System/getenv "AWS_SSM_PREFIX"))
 
+(defn- parse
+  [s]
+  ((some-fn #(try (Integer. %)
+                  (catch Exception ex))
+            #(try (Long. %)
+                  (catch Exception ex))
+            #(try (Double. %)
+                  (catch Exception ex)))
+   s))
+
 (defn fetch
   [prefix]
   (->> (try (fetch-parameters prefix)
@@ -60,7 +69,7 @@
        (group-by (comp first first))
        (map (fn [[k kvs]]
               [k (->> (map (juxt (comp second first)
-                                 (comp parse/value second))
+                                 (comp parse second))
                            kvs)
                       (into {}))]))
        (into {})))
