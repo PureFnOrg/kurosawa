@@ -36,7 +36,7 @@
   refactored this isn't possible."
   []
   (merge (file/fetch "/etc/")
-         (ssm/fetch (or (ssm/prefix-from-security-group)
+         (ssm/fetch (or (ssm/prefix-from-env-var)
                         "/local/platform"))
          (env/fetch)))
 

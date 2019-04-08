@@ -44,6 +44,10 @@
     (catch SocketTimeoutException ex
       (log/info "Timed out fetching EC2 metadata, I'm not running on AWS hardware!"))))
 
+(defn prefix-from-env-var
+  []
+  (System/getenv "AWS_SSM_PREFIX"))
+
 (defn fetch
   [prefix]
   (->> (try (fetch-parameters prefix)
