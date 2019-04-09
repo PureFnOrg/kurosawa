@@ -51,7 +51,7 @@
 
 (defn prefix-from-env-var
   []
-  (some-> (System/getenv "AWS_SSM_PREFIX")
+  (some-> (System/getenv "KUROSAWA_SSM_PREFIX")
           (remove-trailing "/")))
 
 (def ^:private parse
