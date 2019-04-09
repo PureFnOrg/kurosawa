@@ -4,6 +4,7 @@
   Presently, config is stored statefully in an `atom` after initial load."
   (:require [org.purefn.kurosawa.config.env :as env]
             [org.purefn.kurosawa.config.file :as file]
+            [org.purefn.kurosawa.log.core :as klog]
             [org.purefn.kurosawa.util :refer [compile-if]]
             [taoensso.timbre :as log]))
 
@@ -28,6 +29,13 @@
  (defn- fetch-ssm
    []
    (require 'org.purefn.kurosawa.aws.ssm)
+   ;; not a great place for this, but many components still (sadly) read config
+   ;; at *compile time*.  this will spam STDOUT with so much noise otherwise.
+   ;; the `:ns-blacklist` will be reset through the typical initialization in
+   ;; the `log.core` namespace after this SSM fetch.
+   (log/set-config! (update log/*config* :ns-blacklist conj
+                            "org.apache.http.*"
+                            "com.amazonaws.*"))
    (org.purefn.kurosawa.aws.ssm/fetch
     (or (org.purefn.kurosawa.aws.ssm/prefix-from-env-var)
         "/local/platform")))

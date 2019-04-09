@@ -51,8 +51,8 @@
 
 (defn prefix-from-env-var
   []
-  (remove-trailing (System/getenv "AWS_SSM_PREFIX")
-                   "/"))
+  (some-> (System/getenv "AWS_SSM_PREFIX")
+          (remove-trailing "/")))
 
 (def ^:private parse
   (some-fn #(try (Integer. %)
@@ -65,6 +65,7 @@
 
 (defn fetch
   [prefix]
+  (log/info "Loading config from" :prefix prefix)
   (->> (try (fetch-parameters prefix)
             (catch Exception ex
               (log/warn "Unable to fetch from SSM Parameter Store!"

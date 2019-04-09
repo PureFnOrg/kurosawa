@@ -2,7 +2,8 @@
   "Load configuration from the filesystem."
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
-            [org.purefn.kurosawa.config.parse :as parse])
+            [org.purefn.kurosawa.config.parse :as parse]
+            [taoensso.timbre :as log])
   (:import [java.io File]))
 
 (defn- read-directory
@@ -30,6 +31,7 @@
 
 (defn- read-directories
   [& dirs]
+  (log/info "Reading config from" :dirs dirs)
   (->> (map read-directory dirs)
        (reduce merge)))
 

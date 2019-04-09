@@ -1,7 +1,8 @@
 (ns org.purefn.kurosawa.config.env
   "Load configuration from environment variables."
   (:require [clojure.string :as str]
-            [org.purefn.kurosawa.config.parse :as parse]))
+            [org.purefn.kurosawa.config.parse :as parse]
+            [taoensso.timbre :as log]))
 
 (defn- munge-name
   [s]
@@ -33,6 +34,7 @@
     password secure
     num-threads 10}}"
   []
+  (log/info "Reading config from environment variables")
   (->> (System/getenv)
        (map (juxt (comp str/lower-case key)
                   (comp munge-name key)
