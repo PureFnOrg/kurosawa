@@ -6,4 +6,5 @@
   :dependencies [[org.purefn/kurosawa.core _]
                  [org.purefn/kurosawa.log _]
                  [org.purefn/kurosawa.web _]
+                 [org.purefn/kurosawa.aws _]
                  [org.purefn/kurosawa.nrepl _]])
