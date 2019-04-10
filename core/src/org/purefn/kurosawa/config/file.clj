@@ -3,6 +3,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [org.purefn.kurosawa.config.parse :as parse]
+            [org.purefn.kurosawa.transform :as xform]
             [taoensso.timbre :as log])
   (:import [java.io File]))
 
@@ -33,7 +34,7 @@
   [& dirs]
   (log/info "Reading config from" :dirs dirs)
   (->> (map read-directory dirs)
-       (reduce merge)))
+       (apply xform/deep-merge)))
 
 (defn fetch
   ([]

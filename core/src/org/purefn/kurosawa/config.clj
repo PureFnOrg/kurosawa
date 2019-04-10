@@ -5,6 +5,7 @@
   (:require [org.purefn.kurosawa.config.env :as env]
             [org.purefn.kurosawa.config.file :as file]
             [org.purefn.kurosawa.log.core :as klog]
+            [org.purefn.kurosawa.transform :as xform]
             [org.purefn.kurosawa.util :refer [compile-if]]
             [taoensso.timbre :as log]))
 
@@ -46,8 +47,9 @@
 
 (defn default-config
   "This is our default, precendence based, load config from environment
-  mechasnism.  A shallow merge was chosen to make final merged config map easier
-  to reason about.  Current precendence is:
+  mechasnism.  A deep is used to create final config map.
+
+  Current precendence is:
 
   1) Environemt variables
   2) AWS SSM Paramter Store
@@ -61,9 +63,9 @@
   a stateless startup sequence, where each component recieves the entire config map and
   parses out the piece it's interested in."
   []
-  (merge (file/fetch "/etc/")
-         (fetch-ssm)
-         (env/fetch)))
+  (xform/deep-merge (file/fetch "/etc/")
+                    (fetch-ssm)
+                    (env/fetch)))
 
 (defn fetch
   ([]

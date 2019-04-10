@@ -64,3 +64,12 @@
                           (cons x (step (rest s) (conj seen d-val)))))))
                   xs seen)))]
      (step coll #{}))))
+
+(defn deep-merge
+  "Intelligently merges nested maps."
+  [& maps]
+  (apply merge-with (fn [& args]
+                      (if (every? map? args)
+                        (apply deep-merge args)
+                        (last args)))
+         maps))
