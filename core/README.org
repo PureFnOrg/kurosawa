@@ -1,0 +1,62 @@
+* kurosawa.core
+
+** What does it do?
+
+Contains error handling, configuration, transforms, and other common utilities needed in 
+any Kurosawa library or application.
+
+** Configuration
+
+The [[./src/org/purefn/kurosawa/config.clj]] namespace is the touch point for fetching 
+config from the environment, upholding the [[https://12factor.net/config][Config Principle]] of the 12-factor app.
+Typical usage may look like:
+
+#+BEGIN_SRC clojure
+(org.purefn.kurosawa.config/set! org.purefn.kurosawa.config.env/fetch)
+#+END_SRC
+
+This would source all config from environment variables, storing the resulting map
+in an atom for future access. A default implementation is provided
+~default-config~, which performs a deep merge from the following sources in order
+precedence:
+
+  - Environment Variables 
+  - AWS SSM Parameter Store 
+  - The file system.
+
+The [[./src/org/purefn/kurosawa/k8s.clj]] namespace is now deprecated, and is a pass
+through to the ~config~ namespace.
+
+*** Background
+
+Ladders'  legacy convention for upholding the Config Principle of the 12-factor
+app has been to store config/secrets on the filesystem. Configuration is loaded by each
+component at application startup time. This approach has worked, but has some
+drawbacks:
+
+  - Manually mounting ConfigMaps/Secrets in Kubernetes is a tedious, error-prone
+    task when creating new deployments and jobs  
+
+  - Sensitive information may be sitting in plaintext on the file system during
+    local development, and the confusing KUBERNETES_SERVICE_HOST environment
+    variable must be set for this to work. Otherwise the engineer must manually
+    inject all necessary config/secrets themselves, leading to (more often than
+    not) secrets in source control.
+
+This mechanism is maintained for backwards compatibility, but given the lowest
+precedence.  Environment variables are given the highest since they are more or
+less the standard industry approach, conventions can be seen at 
+[[./src/org/purefn/kurosawa/env.clj]]
+
+The AWS SSM Parameter Store has the middle precedence, and will likely be the de facto
+source of config for Ladders in the near term for few reasons:
+
+    - We use AWS as our cloud Provider, so arranging engineers' access to parameters
+      is easy.  
+    - Permission for AWS is already inherited from the environment on a
+      local machine and an EC2 node.  
+    - No additional config/secrets mounting are needed in Kubernetes deploy
+      YAMLs. The mechanism to ship config is the same both locally and in the
+      cloud. 
+    - ~lein repl~ should just work, as long as AWS credentials are present.
+
