@@ -7,8 +7,8 @@ The root Kurosawa library.
 
 ## What does it do?
 
-Contains logging, error handling and other common utilities needed in any library or
-application.
+Contains logging, [configuration](./core/README.org), error handling and other common 
+utilities needed in any library or application.
 
 ## Development
 
