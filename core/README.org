@@ -12,11 +12,11 @@ config from the environment, upholding the [[https://12factor.net/config][Config
 Typical usage may look like:
 
 #+BEGIN_SRC clojure
-(org.purefn.kurosawa.config/set! org.purefn.kurosawa.config.env/fetch)
+(org.purefn.kurosawa.config/set! (org.purefn.kurosawa.config.env/fetch))
 #+END_SRC
 
 This would source all config from environment variables, storing the resulting map
-in an atom for future access. A default implementation is provided
+in an atom for future access. A default implementation is provided as
 ~default-config~, which performs a deep merge from the following sources in order
 precedence:
 
@@ -47,6 +47,12 @@ This mechanism is maintained for backwards compatibility, but given the lowest
 precedence.  Environment variables are given the highest since they are more or
 less the standard industry approach, conventions can be seen at 
 [[./src/org/purefn/kurosawa/env.clj]]
+
+Override a specific config would look like this:
+
+#+BEGIN_SRC 
+export ELASTICSEARCH6_HOST="http://localhost:9200/" && lein repl
+#+END_SRC
 
 The AWS SSM Parameter Store has the middle precedence, and will likely be the de facto
 source of config for Ladders in the near term for few reasons:
