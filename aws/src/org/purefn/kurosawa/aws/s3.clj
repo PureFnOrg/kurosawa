@@ -4,11 +4,21 @@
             [taoensso.timbre :as log])
   (:import
    [com.amazonaws.services.s3.model ListObjectsRequest ObjectListing]
-   [com.amazonaws.services.s3 AmazonS3Client AmazonS3ClientBuilder]
+   [com.amazonaws.services.s3 AmazonS3Client AmazonS3ClientBuilder AmazonS3URI]
    [com.amazonaws.services.kms AWSKMSClientBuilder]
    [com.amazonaws.services.kms.model DecryptRequest]
    [java.nio ByteBuffer]
    [java.util Base64]))
+
+(defn- append-trailing-slash
+  [s]
+  (if-not (= \/ (last s))
+    (str s "/")
+    s))
+
+(defn- read-json
+  [s]
+  (json/read-json s false))
 
 (defn object-seq
   [client response]
@@ -33,7 +43,7 @@
   (-> (.getObject (AmazonS3ClientBuilder/defaultClient) bucket k)
       (.getObjectContent)
       (slurp)
-      (json/read-json)))
+      (read-json)))
 
 (defn fetch-encrypted-object
   [[bucket k]]
@@ -50,23 +60,41 @@
        (.getPlaintext)
        (.array)
        (String.)
-       (json/read-json)))
+       (read-json)))
 
 (defn fetch-config
   [bucket path]
-  (->> (concat (map fetch-object
-                    (list-objects bucket path))
+  (->> (concat (mapcat fetch-object
+                       (list-objects bucket path))
                (pmap fetch-encrypted-object
                      (list-objects bucket (str path "secrets/"))))
-       ))
+       (map (fn [m]
+              [(m "name")
+               (->> (m "data")
+                    (map (juxt (comp identity key)
+                               (comp str/trim val))))]))
+       (reduce (fn [conf [k vs]]
+                 (merge-with merge conf {k (into {} vs)}))
+               {})))
+
+(defn- append-trailing-slash
+  [s]
+  (if-not (= \/ (last s))
+    (str s "/")
+    s))
 
 (defn fetch
-  []
-  (let [bucket (System/getenv "KUROSAWA_S3_CONFIG_BUCKET")
-        path (System/getenv "KUROSAWA_S3_CONFIG_PATH")]
-    (if-not (and bucket path)
-      (log/warn "Environment variables for fetching config not found."
-                "Both KUROSAWA_S3_CONFIG_BUCKET and KUROSAWA_S3_CONFIG_PATH"
-                "must be set!"
-                :bucket bucket :path path)
-      (fetch-config bucket path))))
+  ([]
+   (fetch (System/getenv "KUROSAWA_S3_CONFIG_URI")))
+  ([uri]
+   (let [[bucket path] (some-> uri
+                               (AmazonS3URI.)
+                               ((juxt (memfn getBucket)
+                                      (comp append-trailing-slash
+                                            (memfn getKey)))))]
+     (if-not (and bucket path)
+       (log/warn "Environment variables for fetching config not found."
+                 "Both KUROSAWA_S3_CONFIG_BUCKET and KUROSAWA_S3_CONFIG_PATH"
+                 "must be set!"
+                 :bucket bucket :path path)
+       (fetch-config bucket path)))))
