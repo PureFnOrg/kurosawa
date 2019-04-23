@@ -64,6 +64,7 @@
 
 (defn fetch-config
   [bucket path]
+  (log/info "Reading config from s3" :bucket bucket :path path)
   (->> (concat (mapcat fetch-object
                        (list-objects bucket path))
                (pmap fetch-encrypted-object
@@ -93,8 +94,6 @@
                                       (comp append-trailing-slash
                                             (memfn getKey)))))]
      (if-not (and bucket path)
-       (log/warn "Environment variables for fetching config not found."
-                 "Both KUROSAWA_S3_CONFIG_BUCKET and KUROSAWA_S3_CONFIG_PATH"
-                 "must be set!"
-                 :bucket bucket :path path)
+       (log/warn "Environment variable for fetching config not found,"
+                 "KUROSAWA_S3_CONFIG_URI must be set!")
        (fetch-config bucket path)))))
