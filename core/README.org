@@ -21,7 +21,7 @@ in an atom for future access. A default implementation is provided as
 precedence:
 
   - Environment Variables 
-  - AWS SSM Parameter Store 
+  - AWS S3
   - The file system.
 
 The [[./src/org/purefn/kurosawa/k8s.clj]] namespace is now deprecated, and is a pass
@@ -54,11 +54,12 @@ Override a specific config would look like this:
 export ELASTICSEARCH6_HOST="http://localhost:9200/" && lein repl
 #+END_SRC
 
-The AWS SSM Parameter Store has the middle precedence, and will likely be the de facto
+The AWS S3 has the middle precedence, and will likely be the de facto
 source of config for Ladders in the near term for few reasons:
 
-    - We use AWS as our cloud Provider, so arranging engineers' access to parameters
-      is easy.  
+    - We use AWS as our cloud Provider, so arranging engineers' and nodes' access 
+      to s3 buckets and KMS keys is easy.  
+    - Secrets are encrypted at rest via KMS.
     - Permission for AWS is already inherited from the environment on a
       local machine and an EC2 node.  
     - No additional config/secrets mounting are needed in Kubernetes deploy
