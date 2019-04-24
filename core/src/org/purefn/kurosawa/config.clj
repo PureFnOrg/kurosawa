@@ -29,8 +29,17 @@
   []
   (try
     ;; avoid a hard dependency on `aws.s3` from this project.
-    (require '[org.purefn.kurosawa.aws.s3 :as s3])
-    (eval '(s3/fetch))
+    (require '[org.purefn.kurosawa.aws.s3])
+
+    ;; not a great place for this, but many components still (sadly) read config
+    ;; at *compile time*.  this will spam STDOUT with so much noise otherwise.
+    ;; the `:ns-blacklist` will be reset through the typical initialization in
+    ;; the `log.core` namespace after this SSM fetch.
+    (log/set-config! (update log/*config* :ns-blacklist conj
+                             "org.apache.http.*"
+                             "com.amazonaws.*"))
+
+    (eval '(org.purefn.kurosawa.aws.s3/fetch))
     (catch FileNotFoundException ex
       (log/warn "Tried to load org/purefn/kurosawa/aws/s3.clj but it was"
                 "not found in the classpath!"))))
