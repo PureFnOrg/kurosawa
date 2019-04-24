@@ -1,4 +1,25 @@
 (ns org.purefn.kurosawa.aws.s3
+  "Fetch config from AWS S3.
+
+  Expects the environment variable KUROSAWA_S3_CONFIG_URI to be set to something
+  like:
+
+  s3://my-bucket/path/to/the/things
+
+  Unencrypted JSON files should be located at
+
+  s3://my-bucket/path/to/the/things/configs 
+
+  KMS encrypted JSON files files should be located at
+
+  s3://my-bucket/path/to/the/things/secrets
+
+  The resulting config map will look like
+
+  {s3-file1 {key1 value1
+             key2 value2}
+   s3-file2 {key3 value3
+             key4 value4}}"
   (:require [clojure.data.json :as json]
             [clojure.string :as str]
             [taoensso.timbre :as log])
