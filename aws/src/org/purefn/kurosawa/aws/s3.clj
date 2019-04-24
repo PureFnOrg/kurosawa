@@ -42,7 +42,18 @@
   [s]
   (json/read-json s false))
 
-(def basename
+;; temporarily needed while moving from k8s configs where all things are stringly
+;; typed.
+(def ^:private parse
+  (some-fn #(try (Integer. %)
+                 (catch Exception ex))
+           #(try (Long. %)
+                 (catch Exception ex))
+           #(try (Double. %)
+                 (catch Exception ex))
+           identity))
+
+(def ^:private basename
   (comp
    (fn [s]
      (let [i (.lastIndexOf s ".")]
@@ -104,7 +115,7 @@
        (map (fn [[n kvs]]
               [n
                (map (juxt (comp identity key)
-                          (comp str/trim val))
+                          (comp parse str/trim val))
                     kvs)]))
        (reduce (fn [conf [k vs]]
                  (merge-with merge conf {k (into {} vs)}))
