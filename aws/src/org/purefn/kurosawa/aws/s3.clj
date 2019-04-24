@@ -7,6 +7,7 @@
    [com.amazonaws.services.s3 AmazonS3Client AmazonS3ClientBuilder AmazonS3URI]
    [com.amazonaws.services.kms AWSKMSClientBuilder]
    [com.amazonaws.services.kms.model DecryptRequest]
+   [java.io File]
    [java.nio ByteBuffer]
    [java.util Base64]))
 
@@ -19,6 +20,16 @@
 (defn- read-json
   [s]
   (json/read-json s false))
+
+(def basename
+  (comp
+   (fn [s]
+     (let [i (.lastIndexOf s ".")]
+       (if (pos? i)
+         (subs s 0 i)
+         s)))
+   (memfn getName)
+   #(File. %)))
 
 (defn object-seq
   [client response]
@@ -43,7 +54,7 @@
   (-> (.getObject (AmazonS3ClientBuilder/defaultClient) bucket k)
       (.getObjectContent)
       (slurp)
-      (read-json)))
+      ((juxt (constantly (basename k)) read-json))))
 
 (defn fetch-encrypted-object
   [[bucket k]]
@@ -60,29 +71,23 @@
        (.getPlaintext)
        (.array)
        (String.)
-       (read-json)))
+       ((juxt (constantly (basename k)) read-json))))
 
 (defn fetch-config
   [bucket path]
   (log/info "Reading config from s3" :bucket bucket :path path)
-  (->> (concat (mapcat fetch-object
-                       (list-objects bucket path))
+  (->> (concat (pmap fetch-object
+                     (list-objects bucket (str path "configs/")))
                (pmap fetch-encrypted-object
                      (list-objects bucket (str path "secrets/"))))
-       (map (fn [m]
-              [(m "name")
-               (->> (m "data")
-                    (map (juxt (comp identity key)
-                               (comp str/trim val))))]))
+       (map (fn [[n kvs]]
+              [n
+               (map (juxt (comp identity key)
+                          (comp str/trim val))
+                    kvs)]))
        (reduce (fn [conf [k vs]]
                  (merge-with merge conf {k (into {} vs)}))
                {})))
-
-(defn- append-trailing-slash
-  [s]
-  (if-not (= \/ (last s))
-    (str s "/")
-    s))
 
 (defn fetch
   ([]
