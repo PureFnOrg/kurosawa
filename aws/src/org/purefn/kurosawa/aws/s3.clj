@@ -6,19 +6,21 @@
 
   s3://my-bucket/path/to/the/things
 
-  Unencrypted JSON files should be located at
+  Unencrypted JSON files located at
+  - s3://my-bucket/path/to/the/things/configs/config-1.json 
+  - s3://my-bucket/path/to/the/things/configs/config-2.json 
+  
+  and KMS encrypted JSON files located at
+  - s3://my-bucket/path/to/the/things/secrets/config-2.json
+  - s3://my-bucket/path/to/the/things/secrets/config-3.json
 
-  s3://my-bucket/path/to/the/things/configs 
+  will be read (merged) into a map like
 
-  KMS encrypted JSON files files should be located at
-
-  s3://my-bucket/path/to/the/things/secrets
-
-  The resulting config map will look like
-
-  {s3-file1 {key1 value1
+  {config-1 {key1 value1
              key2 value2}
-   s3-file2 {key3 value3
+   config-2 {key3 value3
+             key4 value4}
+   config-3 {key3 value3
              key4 value4}}"
   (:require [clojure.data.json :as json]
             [clojure.string :as str]
