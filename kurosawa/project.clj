@@ -3,7 +3,8 @@
   :plugins [[lein-modules "0.3.11"]]
   :packaging "pom"
 
-  :dependencies [[org.purefn/kurosawa.core _]
+  :dependencies [[org.purefn/kurosawa.aws _]
+                 [org.purefn/kurosawa.core _]
                  [org.purefn/kurosawa.log _]
                  [org.purefn/kurosawa.web _]
                  [org.purefn/kurosawa.aws _]

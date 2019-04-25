@@ -22,14 +22,15 @@
   [m]
   (reset! config-map m))
 
-(defn fetch-ssm
-  "This does some nasty things to avoid a hard dependency on `aws.ssm` in this project.
+(defn fetch-s3
+  "This does some nasty things to avoid a hard dependency on `aws.s3` in this project.
 
   Consider this docstring an apology. `default-config` shouldn't exist as such."
   []
   (try
-    ;; avoid a hard dependency on `aws.ssm` from this project.
-    (require '[org.purefn.kurosawa.aws.ssm :as ssm])
+    ;; avoid a hard dependency on `aws.s3` from this project.
+    (require '[org.purefn.kurosawa.aws.s3])
+
     ;; not a great place for this, but many components still (sadly) read config
     ;; at *compile time*.  this will spam STDOUT with so much noise otherwise.
     ;; the `:ns-blacklist` will be reset through the typical initialization in
@@ -37,12 +38,10 @@
     (log/set-config! (update log/*config* :ns-blacklist conj
                              "org.apache.http.*"
                              "com.amazonaws.*"))
-    (eval
-     '(ssm/fetch
-       (or (ssm/prefix-from-env-var)
-           "/local/platform")))
+
+    (eval '(org.purefn.kurosawa.aws.s3/fetch))
     (catch FileNotFoundException ex
-      (log/warn "Tried to load org/purefn/kurosawa/aws/ssm but it was"
+      (log/warn "Tried to load org/purefn/kurosawa/aws/s3.clj but it was"
                 "not found in the classpath!"))))
 
 
@@ -53,7 +52,7 @@
   Current precendence is:
 
   1) Environemt variables
-  2) AWS SSM Paramter Store
+  2) AWS S3
   3) The filesystem (legacy)
 
   Ultimately we shouldn't need this, the config stage of application/development
@@ -65,7 +64,7 @@
   parses out the piece it's interested in."
   []
   (xform/deep-merge (file/fetch "/etc/")
-                    (fetch-ssm)
+                    (fetch-s3)
                     (env/fetch)))
 
 (defn fetch

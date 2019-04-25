@@ -1,7 +1,6 @@
 (ns org.purefn.kurosawa.aws.ssm
   "Fetch config from the SSM parameter store."
-  (:require [clj-http.client :as http]
-            [clojure.string :as str]
+  (:require [clojure.string :as str]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :refer [instrument]]
             [taoensso.timbre :as log])
@@ -32,16 +31,6 @@
              (map (fn [^Parameter p] [(.getName p) (.getValue p)]))
              (into {}))
         (fetch-parameters path (.getNextToken resp)))))))
-
-(defn prefix-from-security-group
-  []
-  (try 
-    (http/get "http://169.254.169.254/latest/meta-data/security-groups/"
-              {:socket-timeout 500
-               :conn-timeout 500})
-    ;; The rest of this is a stub, for now.
-    (catch SocketTimeoutException ex
-      (log/info "Timed out fetching EC2 metadata, I'm not running on AWS hardware!"))))
 
 (defn remove-trailing
   [s c]

@@ -3,7 +3,6 @@
   :description "AWS Utilities."
   :dependencies [[com.amazonaws/aws-java-sdk-core "1.11.533"]
                  [com.amazonaws/aws-java-sdk-ssm "1.11.533"]
-                 [clj-http "3.9.1"]
+                 [com.amazonaws/aws-java-sdk-s3 "1.11.533"]
+                 [org.clojure/data.json "0.2.6"]
                  [com.taoensso/timbre _]])
-
-
