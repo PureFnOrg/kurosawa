@@ -54,8 +54,8 @@ Overriding a specific config would look like this:
 export ELASTICSEARCH6_HOST="http://localhost:9200/" && lein repl
 #+END_SRC
 
-The AWS S3 has the middle precedence, and will likely be the de facto
-source of config for Ladders in the near term for few reasons:
+AWS S3 has the middle precedence, and will likely be the de facto
+source of config for Ladders in the near term for a few reasons:
 
     - We use AWS as our cloud Provider, so arranging engineers' and nodes' access 
       to s3 buckets and KMS keys is easy.  
