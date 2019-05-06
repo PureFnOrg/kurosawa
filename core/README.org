@@ -46,7 +46,7 @@ drawbacks:
 This mechanism is maintained for backwards compatibility, but given the lowest
 precedence.  Environment variables are given the highest since they are more or
 less the standard industry approach, conventions can be seen at 
-[[./src/org/purefn/kurosawa/env.clj]]
+[[./src/org/purefn/kurosawa/config/env.clj]]
 
 Override a specific config would look like this:
 
