@@ -48,7 +48,7 @@ precedence.  Environment variables are given the highest since they are more or
 less the standard industry approach, conventions can be seen at 
 [[./src/org/purefn/kurosawa/config/env.clj]]
 
-Override a specific config would look like this:
+Overriding a specific config would look like this:
 
 #+BEGIN_SRC 
 export ELASTICSEARCH6_HOST="http://localhost:9200/" && lein repl
