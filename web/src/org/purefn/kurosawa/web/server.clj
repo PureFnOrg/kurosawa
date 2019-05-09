@@ -1,13 +1,14 @@
 (ns org.purefn.kurosawa.web.server
   "Immutant web server component."
-  (:require [clojure.spec.alpha :as s]
+  (:require [clojure.set :as set]
+            [clojure.spec.alpha :as s]
             [com.stuartsierra.component :as component]
             [immutant.web :as web]
-            [taoensso.timbre :as log]
-            [org.purefn.kurosawa.log.core :as klog]
             [org.purefn.kurosawa.log.api :as log-api]
+            [org.purefn.kurosawa.log.core :as klog]
             [org.purefn.kurosawa.log.protocol :as log-proto]
-            [org.purefn.kurosawa.web.app :as app])
+            [org.purefn.kurosawa.web.app :as app]
+            [taoensso.timbre :as log])
   (:import org.purefn.kurosawa.web.app.App))
 
 ;;------------------------------------------------------------------------------
@@ -23,12 +24,14 @@
       (do
         (log/info "Immutant web server already started")
         this)
-      (let [{:keys [::host ::port]}
-            config
-            _ (log/info "Starting Immutant web server binding to"
-                        host "port" port)
+      (let [_ (log/info "Starting Immutant web server with" config)
             app-handle (app/app-handler app)
-            serv-handle (web/run app-handle :host host :port port)]
+            serv-handle (web/run app-handle
+                          (set/rename-keys config
+                           {::io-threads :io-threads
+                            ::worker-threads :worker-threads
+                            ::host :host
+                            ::port :port}))]
         (assoc this :server serv-handle))))
   
   (stop [this]
@@ -93,7 +96,11 @@
 
 (s/def ::host string?)
 (s/def ::port pos-int?)
-(s/def ::config (s/keys :req [::host ::port]))
+(s/def ::io-threads pos-int?)
+(s/def ::worker-threads pos-int?)
+(s/def ::config (s/keys :req [::host ::port]
+                        :opt [::io-threads ::worker-threads]))
+
 (s/def ::app (partial instance? App))
 
 (s/fdef immutant-server
