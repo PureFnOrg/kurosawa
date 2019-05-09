@@ -4,7 +4,6 @@
             [clojure.spec.alpha :as s]
             [com.stuartsierra.component :as component]
             [immutant.web :as web]
-            [immutant.web.undertow :as undertow]
             [org.purefn.kurosawa.log.api :as log-api]
             [org.purefn.kurosawa.log.core :as klog]
             [org.purefn.kurosawa.log.protocol :as log-proto]
