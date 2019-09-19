@@ -52,13 +52,9 @@
   []
   (component/system-map
    :app (app/app (app/default-config)
-                 test-routes)
+                 (handler))
    :server (component/using
             (server/immutant-server (server/default-config))
-            [:app])
-   ))
+            [:app])))
 
 (set-init (fn [_] (dev-system)))
-
-
-
