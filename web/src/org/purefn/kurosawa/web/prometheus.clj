@@ -1,4 +1,9 @@
 (ns org.purefn.kurosawa.web.prometheus
+  "Includes a prometheus ring middleware using iapetos and bidi.  Bidi's route
+  matching is required to remove route params from the time series.
+
+  This library does not include iapetos and bidi as dependencies directly, so
+  requiring this namespace will break unless you've done so yourself."
   (:require [bidi.bidi :as bidi]
             [clojure.string :as str]
             [iapetos.core :as prometheus]
