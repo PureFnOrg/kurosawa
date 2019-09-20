@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.core "2.1.7"
+(defproject org.purefn/kurosawa.core "2.1.8-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "The root Kurosawa library."
   :dependencies [[com.stuartsierra/component _]
