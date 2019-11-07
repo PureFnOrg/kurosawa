@@ -17,7 +17,7 @@
            (remove (comp (set ignore-keys)
                          first))
            (reduce (fn [path [p v]]
-                     (str/replace path (re-pattern v) (str p)))
+                     (str/replace path v (str p)))
                    uri))
       uri))
 
