@@ -170,6 +170,14 @@
          (fail))
     (succeed (map success rs))))
 
+(defn success-or-throw
+  "Unwraps a result, throwing if `Failure`, and returning the underlying value
+  if `Success`."
+  [result]
+  (if-let [f (failure result)]
+    (throw (or (and (instance? Throwable f) f)
+               (ex-info "Unknown failure" {:failure f})))
+    (success result)))
 
 ;;------------------------------------------------------------------------------
 ;; Specs
