@@ -13,13 +13,7 @@
 ;; for an explanation of this hack.
 
 (defn- nrepl-handler []
-  (try 
-    (require 'cider.nrepl)
-    (ns-resolve 'cider.nrepl 'cider-nrepl-handler)
-    (catch java.io.FileNotFoundException ex
-      (log/error "Tried to start a cider-nrepl handler but got:\n" (str (.getMessage ex))
-                 "\nHave you included cider/cider-nrepl as a dependency? "
-                 "See: https://github.com/PureFnOrg/kurosawa/helpfulreadme.txt"))))
+  (ns-resolve 'cider.nrepl 'cider-nrepl-handler))
 
 (defrecord CiderReplServer
     [config server]
@@ -31,8 +25,14 @@
         (log/info "CiderReplServer already started on port" (::port config))
         this)
       (let [port (::port config)
-            _ (log/info "Starting CiderReplServer on port" port config)
-            srv (if (::use-cider config)
+            _ (log/info "Starting CiderReplServer on port" port)
+            use-cider (try (require 'cider.nrepl)
+                           true
+                           (catch Exception ex
+                             (log/debug ex)
+                             (log/info "cider.nrepl not loaded, falling back to nrepl.")
+                             false))
+            srv (if use-cider
                   (repl/start-server :port port
                                      :bind "localhost"
                                      :handler (nrepl-handler))
@@ -60,8 +60,7 @@
 
    - `name` The root of the ConfigMap and Secrets directory.  Defaults to 
    `repl` if not provided."
-  ([name] {::port 7888
-           ::use-cider false})
+  ([name] {::port 7888})
   ([] (default-config "repl")))
 
 ;;------------------------------------------------------------------------------
@@ -79,9 +78,7 @@
 ;;------------------------------------------------------------------------------
 
 (s/def ::port pos-int?)
-(s/def ::config (s/keys :req [::port]
-                        :opt [::use-cider]))
-(s/def ::use-cider boolean?)
+(s/def ::config (s/keys :req [::port]))
 
 (s/fdef cider-repl-server
         :args (s/cat :config ::config)

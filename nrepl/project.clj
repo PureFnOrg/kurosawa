@@ -6,4 +6,4 @@
                  [nrepl "0.6.0"]]
 
   :profiles {:provided
-             {:dependencies [[cider/cider-nrepl "0.18.0"]]}})
+             {:dependencies [[cider/cider-nrepl "0.22.4"]]}})

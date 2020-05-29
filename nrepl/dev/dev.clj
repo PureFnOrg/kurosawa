@@ -29,8 +29,7 @@
   "Constructs a system map suitable for interactive development."
   []
   (component/system-map
-   :nrepl (nrepl/cider-repl-server (assoc (nrepl/default-config)
-                                          ::nrepl/use-cider true))
+   :nrepl (nrepl/cider-repl-server (nrepl/default-config))
    ))
 
 (set-init (fn [_] (dev-system)))
