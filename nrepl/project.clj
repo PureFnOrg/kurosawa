@@ -3,5 +3,7 @@
   :description "The Kurosawa nREPL library."
   :dependencies [[com.stuartsierra/component _]
                  [com.taoensso/timbre _]
-                 [cider/cider-nrepl "0.18.0"]
-                 [nrepl "0.5.2"]])
+                 [nrepl "0.6.0"]]
+
+  :profiles {:provided
+             {:dependencies [[cider/cider-nrepl "0.18.0"]]}})

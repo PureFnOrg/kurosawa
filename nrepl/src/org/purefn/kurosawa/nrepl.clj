@@ -13,8 +13,13 @@
 ;; for an explanation of this hack.
 
 (defn- nrepl-handler []
-  (require 'cider.nrepl)
-  (ns-resolve 'cider.nrepl 'cider-nrepl-handler))
+  (try 
+    (require 'cider.nrepl)
+    (ns-resolve 'cider.nrepl 'cider-nrepl-handler)
+    (catch java.io.FileNotFoundException ex
+      (log/error "Tried to start a cider-nrepl handler but got:\n" (str (.getMessage ex))
+                 "\nHave you included cider/cider-nrepl as a dependency? "
+                 "See: https://github.com/PureFnOrg/kurosawa/helpfulreadme.txt"))))
 
 (defrecord CiderReplServer
     [config server]
@@ -26,10 +31,13 @@
         (log/info "CiderReplServer already started on port" (::port config))
         this)
       (let [port (::port config)
-            _ (log/info "Starting CiderReplServer on port" port)
-            srv (repl/start-server :port port
-                                   :bind "localhost"
-                                   :handler (nrepl-handler))]
+            _ (log/info "Starting CiderReplServer on port" port config)
+            srv (if (::use-cider config)
+                  (repl/start-server :port port
+                                     :bind "localhost"
+                                     :handler (nrepl-handler))
+                  (repl/start-server :port port
+                                     :bind "localhost"))]
         (assoc this :server srv))))
   (stop [this]
     (if server
@@ -52,7 +60,8 @@
 
    - `name` The root of the ConfigMap and Secrets directory.  Defaults to 
    `repl` if not provided."
-  ([name] {::port 7888})
+  ([name] {::port 7888
+           ::use-cider false})
   ([] (default-config "repl")))
 
 ;;------------------------------------------------------------------------------
@@ -70,7 +79,9 @@
 ;;------------------------------------------------------------------------------
 
 (s/def ::port pos-int?)
-(s/def ::config (s/keys :opt [::port]))
+(s/def ::config (s/keys :req [::port]
+                        :opt [::use-cider]))
+(s/def ::use-cider boolean?)
 
 (s/fdef cider-repl-server
         :args (s/cat :config ::config)
