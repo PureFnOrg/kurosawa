@@ -13,7 +13,6 @@
 ;; for an explanation of this hack.
 
 (defn- nrepl-handler []
-  (require 'cider.nrepl)
   (ns-resolve 'cider.nrepl 'cider-nrepl-handler))
 
 (defrecord CiderReplServer
@@ -27,9 +26,18 @@
         this)
       (let [port (::port config)
             _ (log/info "Starting CiderReplServer on port" port)
-            srv (repl/start-server :port port
-                                   :bind "localhost"
-                                   :handler (nrepl-handler))]
+            use-cider (try (require 'cider.nrepl)
+                           true
+                           (catch Exception ex
+                             (log/debug ex)
+                             (log/info "cider.nrepl not loaded, falling back to nrepl.")
+                             false))
+            srv (if use-cider
+                  (repl/start-server :port port
+                                     :bind "localhost"
+                                     :handler (nrepl-handler))
+                  (repl/start-server :port port
+                                     :bind "localhost"))]
         (assoc this :server srv))))
   (stop [this]
     (if server
@@ -70,7 +78,7 @@
 ;;------------------------------------------------------------------------------
 
 (s/def ::port pos-int?)
-(s/def ::config (s/keys :opt [::port]))
+(s/def ::config (s/keys :req [::port]))
 
 (s/fdef cider-repl-server
         :args (s/cat :config ::config)
