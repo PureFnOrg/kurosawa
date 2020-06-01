@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.nrepl "2.1.11-SNAPSHOT"
+(defproject org.purefn/kurosawa.nrepl "2.1.11"
   :plugins [[lein-modules "0.3.11"]]
   :description "The Kurosawa nREPL library."
   :dependencies [[com.stuartsierra/component _]
