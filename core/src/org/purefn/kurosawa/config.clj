@@ -25,7 +25,13 @@
 (defn fetch-s3
   "This does some nasty things to avoid a hard dependency on `aws.s3` in this project.
 
-  Consider this docstring an apology. `default-config` shouldn't exist as such."
+  Ultimately we shouldn't need this, the config stage of application/development
+  startup needs to revisited.  But until all of our components' constructors are
+  refactored this isn't possible.
+
+  When that day comes we can remove the use of `eval`, the atom, and move to
+  a stateless startup sequence, where each component recieves the entire config map and
+  parses out the piece it's interested in."
   []
   (try
     ;; avoid a hard dependency on `aws.s3` from this project.
@@ -44,7 +50,6 @@
       (log/warn "Tried to load org/purefn/kurosawa/aws/s3.clj but it was"
                 "not found in the classpath!"))))
 
-
 (defn default-config
   "This is our default, precendence based, load config from environment
   mechasnism.  A deep merge is used to create final config map.
@@ -53,19 +58,13 @@
 
   1) Environemt variables
   2) AWS S3
-  3) The filesystem (legacy)
 
-  Ultimately we shouldn't need this, the config stage of application/development
-  startup needs to revisited.  But until all of our components' constructors are
-  refactored this isn't possible.
-
-  When that day comes we can remove the use of `eval`, the atom, and move to
-  a stateless startup sequence, where each component recieves the entire config map and
-  parses out the piece it's interested in."
+  Typical usage involves the fetching the base config from s3 with overrides provided
+  by environment variables.  Full configuration via environment variables is not
+  supported; only environment variables for which a matching top-level map is found
+  will be merged."
   []
-  (xform/deep-merge (file/fetch "/etc/")
-                    (fetch-s3)
-                    (env/fetch)))
+  (env/merge-overrides (fetch-s3)))
 
 (defn fetch
   ([]

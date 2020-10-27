@@ -46,3 +46,32 @@
                            kvs)
                       (into {}))]))
        (into {})))
+
+(defn- candidate-keys
+  "Return possible config paths for an environment variable.
+
+  MYSQL_NUM_THREADS -> ([mysql num-threads] [mysql-num threads])"
+  [k]
+  (let [parts (-> (str/lower-case k)
+                  (str/split #"_"))]
+    (->> (count parts)
+         (range)
+         (map (juxt range #(range % (count parts))))
+         (filterv (comp seq first))
+         (map (fn [[kns vns]]
+                [(str/join "-" (map (partial get parts) kns))
+                 (str/join "-" (map (partial get parts) vns))])))))
+
+(defn merge-overrides
+  "Fetches config from the environment only udpating paths already present in `conf`."
+  [conf]
+  (reduce-kv
+   (fn [m k v]
+     (reduce (fn [m [topk _ :as path]]
+               (if (get m topk)
+                 (assoc-in m path v)
+                 m))
+             m
+             (candidate-keys k)))
+   conf
+   (into {} (System/getenv))))
