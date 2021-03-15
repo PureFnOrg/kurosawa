@@ -27,18 +27,17 @@
 
 ;;------------------------------------------------------------------------------
 ;; Middleware
-;;
-;; This protocol can be implemented and used to apply middleware to the handler
-;; function provided to the `App`. The component would then need to be part of
-;; the `SystemMap` under the key :middleware.
-;;
-;; The use case for this type of middleware would be that which is dependent on
-;; a stateful component that needs to be used by other components within the
-;; `SystemMap`.
 ;;------------------------------------------------------------------------------
 
 (defprotocol Middleware
-  (apply-middleware [this handler]))
+  "This protocol can be implemented and used to apply middleware to the handler
+  function provided to the `App`. The component would then need to be part of
+  the `SystemMap` under the key :middleware.
+
+  The use case for this would be middleware which is dependent on a stateful
+  component that needs to be used by other components within the `SystemMap`"
+  (apply-middleware [this handler]
+   "Returns `handler` with middleware applied"))
 
 (defn wrap-services
   "Middleware that wraps a handler with given services map."
