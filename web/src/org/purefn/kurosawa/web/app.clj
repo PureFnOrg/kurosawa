@@ -25,6 +25,9 @@
 (defrecord App
     [config handler])
 
+(defprotocol Middleware
+  (apply-middleware [this handler]))
+
 (defn wrap-services
   "Middleware that wraps a handler with given services map."
   [h services]
@@ -34,8 +37,10 @@
 (defn app-handler
   "Main API function. Builds handler function from app."
   [app]
-  (let [services (dissoc app :config :handler)
-        handler (:handler app)]
+  (let [services (dissoc app :config :handler :middleware)
+        handler (if-let [mw (:middleware app)]
+                  (apply-middleware mw (:handler app))
+                  (:handler app))]
     (wrap-services handler services)))
 
 (defn service
@@ -72,6 +77,8 @@
 ;;------------------------------------------------------------------------------
 ;; Specs. 
 ;;------------------------------------------------------------------------------
+
+(s/def ::middleware (partial satisfies? Middleware))
 
 (s/def ::services
   (s/map-of keyword? (partial satisfies? component/Lifecycle)))
