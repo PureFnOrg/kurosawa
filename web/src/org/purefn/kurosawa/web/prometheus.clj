@@ -208,10 +208,10 @@
 
   For more detail see iapetos.collector.ring/wrap-instrumentation:
   https://github.com/clj-commons/iapetos/blob/0fecedaf8454e17e41b05e0e14754a311b9f4ce2/src/iapetos/collector/ring.clj#L143"
-  [handler [{:keys [path-fn label-fn]
-             :or {path-fn  :uri
-                  label-fn (constantly {})}
-             :as options}]]
+  [handler {:keys [path-fn label-fn]
+            :or {path-fn  :uri
+                 label-fn (constantly {})}
+            :as options}]
   (fn [request]
     (run-instrumented {:path-fn  path-fn
                        :label-fn label-fn
