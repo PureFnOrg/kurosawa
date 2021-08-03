@@ -25,7 +25,7 @@
 ;; Stateful component
 
 (defrecord PrometheusRegistry
-    [registration]
+           [registration]
 
   component/Lifecycle
   (start [this]
@@ -89,24 +89,24 @@
 (defn- make-latency-collector
   [labels buckets]
   (prometheus/histogram
-    :http/request-latency-seconds
-    {:description "the response latency for HTTP requests."
-     :labels (concat [:method :status :statusClass :path] labels)
-     :buckets buckets}))
+   :http/request-latency-seconds
+   {:description "the response latency for HTTP requests."
+    :labels (concat [:method :status :statusClass :path] labels)
+    :buckets buckets}))
 
 (defn- make-count-collector
   [labels]
   (prometheus/counter
-    :http/requests-total
-    {:description "the total number of HTTP requests processed."
-     :labels (concat [:method :status :statusClass :path] labels)}))
+   :http/requests-total
+   {:description "the total number of HTTP requests processed."
+    :labels (concat [:method :status :statusClass :path] labels)}))
 
 (defn- make-exception-collector
   [labels]
   (ex/exception-counter
-    :http/exceptions-total
-    {:description "the total number of exceptions encountered during HTTP processing."
-     :labels (concat [:method :path] labels)}))
+   :http/exceptions-total
+   {:description "the total number of exceptions encountered during HTTP processing."
+    :labels (concat [:method :path] labels)}))
 
 (defn initialize
   "Initialize all collectors for Ring handler instrumentation. This includes:
@@ -122,10 +122,10 @@
        :or {latency-histogram-buckets [0.001 0.005 0.01 0.02 0.05 0.1 0.2 0.3
                                        0.5 0.75 1 5]}}]]
   (prometheus/register
-    registry
-    (make-latency-collector labels latency-histogram-buckets)
-    (make-count-collector labels)
-    (make-exception-collector labels)))
+   registry
+   (make-latency-collector labels latency-histogram-buckets)
+   (make-count-collector labels)
+   (make-exception-collector labels)))
 
 ;; ## Response
 
@@ -164,19 +164,21 @@
 
 (defn- record-metrics!
   [{:keys [registry] :as options} delta request response]
-  (let [labels           (merge
-                           {:status      (status response)
-                            :statusClass (status-class response)}
-                           (labels-for options request response))
-        delta-in-seconds (/ delta 1e9)]
-    (-> registry
-        (prometheus/inc     :http/requests-total labels)
-        (prometheus/observe :http/request-latency-seconds labels delta-in-seconds))))
+  (when registry
+    (let [labels           (merge
+                            {:status      (status response)
+                             :statusClass (status-class response)}
+                            (labels-for options request response))
+          delta-in-seconds (/ delta 1e9)]
+      (-> registry
+          (prometheus/inc     :http/requests-total labels)
+          (prometheus/observe :http/request-latency-seconds labels delta-in-seconds)))))
 
 (defn- exception-counter-for
   [{:keys [registry] :as options} request]
-  (->> (labels-for options request)
-       (registry :http/exceptions-total)))
+  (when registry
+    (->> (labels-for options request)
+         (registry :http/exceptions-total))))
 
 (defn- run-instrumented
   [{:keys [handler] :as options} request]
@@ -213,11 +215,14 @@
                  label-fn (constantly {})}
             :as options}]
   (fn [request]
-    (run-instrumented {:path-fn  path-fn
-                       :label-fn label-fn
-                       :registry (:registry (app/service request :prometheus))
-                       :handler  handler}
-                      request)))
+    (if-let [registry (:registry (app/service request :prometheus))]
+      (run-instrumented {:path-fn path-fn
+                         :label-fn label-fn
+                         :registry registry
+                         :handler handler}
+                        request)
+      (do (log/warn "Couldn't execute run-instrumented. Prometheus registry returns nil.")
+          (handler request)))))
 
 (defn wrap-metrics-expose
   "Expose Prometheus metrics at the given constant URI using the text format."
@@ -225,11 +230,12 @@
                :or {path       "/metrics"
                     on-request identity}}]]
   (fn [{:keys [request-method uri] :as request}]
-    (if (= uri path)
-      (if (= request-method :get)
-        (metrics-response (:registry (app/service request :prometheus)))
-        {:status 405})
-      (handler request))))
+    (let [prometheus (app/service request :prometheus)]
+      (if (= uri path)
+        (if (and (= request-method :get) prometheus)
+          (metrics-response (:registry prometheus))
+          {:status 405})
+        (handler request)))))
 
 (defn wrap-stateful-metrics
   "Wrap all ring requests with prometheus instrumentation and exposes metrics
