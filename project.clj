@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa "2.1.15-SNAPSHOT"
+(defproject org.purefn/kurosawa "2.1.15"
   :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
