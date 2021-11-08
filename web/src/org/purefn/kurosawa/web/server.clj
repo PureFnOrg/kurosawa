@@ -95,7 +95,7 @@
   ;;----------------------------------------------------------------------------
   log-proto/Logging
   (log-namespaces [_]
-    ["org.purefn.kurosawa.web.server"])
+    [])  ; all logs for HTTP-Kit are in org.purefn.kurosawa.web.server namespace
 
   (log-configure [this dir]
     (klog/add-component-appender :httpkit (log-api/log-namespaces this)
