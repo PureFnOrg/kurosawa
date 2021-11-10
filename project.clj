@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa "2.1.18-alpha1-SNAPSHOT"
+(defproject org.purefn/kurosawa "2.1.19-SNAPSHOT"
   :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
@@ -23,7 +23,7 @@
   :aliases {"project-version" ["run" "-m" "org.purefn.kurosawa.version"]}
 
   :modules  {:subprocess nil
-             
+
              :inherited {:min-lein-version "2.7.1"
                          :aliases {"all" ^:displace ["do" "clean," "test," "install"]
                                    "-f" ["with-profile" "+fast"]}
