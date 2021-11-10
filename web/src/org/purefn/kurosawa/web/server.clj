@@ -2,6 +2,7 @@
   "Immutant web server component."
   (:require [clojure.set :as set]
             [clojure.spec.alpha :as s]
+            [clojure.string :as string]
             [com.stuartsierra.component :as component]
             [org.httpkit.server :as httpkit-server]
             [immutant.web :as web]
@@ -70,7 +71,12 @@
             config (merge config {:legacy-return-value? false  ; return HttpServer object
                                   :error-logger (fn [msg ex] (log/error ex msg))
                                   :warn-logger  (fn [msg ex] (log/warn ex msg))
-                                  :event-logger (fn [event-name] (log/info event-name))})
+                                  :event-logger (fn [event-name]
+                                                  (when-not (and (some? event-name)
+                                                              (string/starts-with? event-name
+                                                                ;; do not log 2xx status responses
+                                                                "httpkit.server.status.processed.2"))
+                                                    (log/info event-name)))})
             serv-handle (->> {::worker-threads :thread
                               ::host :ip
                               ::port :port}
