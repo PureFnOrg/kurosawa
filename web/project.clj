@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.web "2.1.18"
+(defproject org.purefn/kurosawa.web "2.1.18-alpha1-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "The Kurosawa web library."
   :dependencies [[com.stuartsierra/component _]
