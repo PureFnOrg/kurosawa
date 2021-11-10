@@ -67,25 +67,22 @@
         this)
       (let [_ (log/info "Starting HTTP-Kit web server with" config)
             app-handle (app/app-handler app)
-            config (-> config
-                       (merge {:error-logger (fn [msg ex] (log/error ex msg))
-                               :warn-logger  (fn [msg ex] (log/warn ex msg))
-                               :event-logger (fn [event-name] (log/info event-name))}))
+            config (merge config {:legacy-return-value? false  ; return HttpServer object
+                                  :error-logger (fn [msg ex] (log/error ex msg))
+                                  :warn-logger  (fn [msg ex] (log/warn ex msg))
+                                  :event-logger (fn [event-name] (log/info event-name))})
             serv-handle (->> {::worker-threads :thread
                               ::host :ip
                               ::port :port}
                              (set/rename-keys config)
-                             seq
-                             flatten
-                             (apply httpkit-server/run-server
-                                    app-handle))]
+                             (httpkit-server/run-server app-handle))]
         (assoc this :server serv-handle))))
 
   (stop [this]
     (if server
       (do
         (log/info "Stopping HTTP-Kit web server on port" (::port config))
-        ((:server server))
+        (httpkit-server/server-stop! (:server server))
         (assoc this :server nil))
       (do
         (log/info "HTTP-Kit web server not running")
