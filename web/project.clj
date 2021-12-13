@@ -12,4 +12,5 @@
                  [org.purefn/kurosawa.log _]]
 
   :profiles {:dev {:dependencies [[bidi "2.0.17"]
-                                  [clj-commons/iapetos "0.1.9"]]}})
+                                  [clj-commons/iapetos "0.1.9"]
+                                  [preflex "0.4.0"]]}})

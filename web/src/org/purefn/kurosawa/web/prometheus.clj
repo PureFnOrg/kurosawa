@@ -38,8 +38,8 @@
         (let [reg (f reg)]
           (when-not (instance? IapetosRegistry reg)
             (throw (ex-info (str "Registration fn passed to PrometheusRegistry must "
-                                 "return an instance of IapetosRegistry"
-                                 {:returned reg}))))
+                                 "return an instance of IapetosRegistry")
+                            {:returned reg})))
           reg))
       (-> (prometheus/collector-registry)
           (ring/initialize
