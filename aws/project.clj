@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.aws "2.1.20"
+(defproject org.purefn/kurosawa.aws "2.1.21-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "AWS Utilities."
   :dependencies [[com.amazonaws/aws-java-sdk-core "1.11.533"]
