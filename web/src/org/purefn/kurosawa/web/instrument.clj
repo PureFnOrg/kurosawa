@@ -7,8 +7,11 @@
   (:require [iapetos.core :as prometheus]
             [preflex.instrument :as i]
             [preflex.resilient :as r]
-            [preflex.type :as t])
-  (:import [java.util.concurrent ThreadPoolExecutor]))
+            [preflex.type :as t]
+            [com.stuartsierra.component :as component]
+            [org.purefn.kurosawa.web.app :as app]
+            [org.purefn.kurosawa.web.server :as server])
+  (:import [java.util.concurrent ExecutorService ThreadPoolExecutor]))
 
 ;; --- prometheus collectors/registry ---
 
@@ -80,3 +83,33 @@
                         (wrap-queue-latency-middleware registry bounded-thread-pool))]
     {:handler app-handler
      :thread-pool instrumented-thread-pool}))
+
+;;*************************************
+;; Extension and drop-in replacement for org.purefn.kurosawa.web.app/App
+;; for consumption by the org.purefn.kurosawa.web.server namespace
+(defrecord InstrumentedApp
+  [registry config handler]
+  component/Lifecycle
+  (start [this] (let [{:keys [^long server/worker-threads
+                              ^long server/queue-capacity
+                              ^ExecutorService server/worker-pool]
+                       :or {worker-threads server/default-worker-threads
+                            queue-capacity server/default-queue-capacity}
+                       } config]
+                  (if (some? worker-pool)
+                    this
+                    (as-> (instrument registry handler worker-threads queue-capacity) $
+                      (update $ :handler vary-meta assoc :orig-handler handler) ; preserve original
+                      (merge this $)))))
+  (stop [this] (let [{:keys [^ExecutorService server/worker-pool]} config]
+                 (if (nil? worker-pool)
+                   this
+                   (do
+                     (.shutdownNow worker-pool) ; accept no new tasks, kill waiting tasks
+                     (-> this
+                         (assoc-in [:config :server/worker-pool] nil)
+                         (update :handler #(-> % meta :orig-handler))))))))
+
+(defn make-instrumented-app
+  [config]
+  (->InstrumentedApp nil config nil))
