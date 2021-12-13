@@ -57,6 +57,16 @@
                                  (str dir "/immutant.log"))))
 
 
+(def default-worker-threads
+  "Default worker thread-count for the web server, which is the same as in Immutant,
+   that is (* 8 IO-threads) where IO-threads is available processor count."
+  (* 8 (.availableProcessors (Runtime/getRuntime))))
+
+(def default-queue-capacity
+  "Double-buffering based bounded queue length for requests."
+  (* 2 default-worker-threads))
+
+
 (defrecord HttpkitServer
   [config app server]
 
@@ -68,9 +78,8 @@
         this)
       (let [_ (log/info "Starting HTTP-Kit web server with" config)
             app-handle (app/app-handler app)
-            config (merge {; emulate same number of default threads as Immutant, which is
-                           ; (* 8 io-threads) and io-threads is available processor count
-                           ::worker-threads (* 8 (.availableProcessors (Runtime/getRuntime)))
+            config (merge {::worker-threads default-worker-threads
+                           ::queue-capacity default-queue-capacity
                            :legacy-return-value? false  ; return HttpServer object
                            :error-logger (fn [msg ex] (log/error ex msg))
                            :warn-logger  (fn [msg ex] (log/warn ex msg))
@@ -80,8 +89,11 @@
                                                          ;; do not log 2xx status responses
                                                          "httpkit.server.status.processed.2"))
                                              (log/info event-name)))}
+                          (:config app)  ; instrumented app may have instrumented thread-pool
                      config)
             serv-handle (->> {::worker-threads :thread
+                              ::queue-capacity :queue-size
+                              ::worker-pool :worker-pool
                               ::host :ip
                               ::port :port}
                              (set/rename-keys config)
