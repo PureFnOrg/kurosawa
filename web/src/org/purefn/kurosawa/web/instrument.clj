@@ -4,7 +4,8 @@
 
    This library does not include prometheus (iapetos and bidi) and preflex as dependencies
    directly, so requiring this namespace will break unless you've done so yourself."
-  (:require [iapetos.core :as prometheus]
+  (:require [clojure.set :as set]
+            [iapetos.core :as prometheus]
             [preflex.instrument :as i]
             [preflex.resilient :as r]
             [preflex.type :as t]
@@ -46,11 +47,14 @@
 (defn wrap-queue-latency-middleware
   [f registry bounded-thread-pool]
   (fn [request]
-    (-> registry
-        (prometheus/set :http/thread-count (.getPoolSize ^ThreadPoolExecutor (t/thread-pool bounded-thread-pool)))
-        (prometheus/set :http/waiting-count (t/queue-size bounded-thread-pool)))
-    (when-some [dqm (:duration-queue-ms *context*)]
-      (prometheus/set registry :http/wait-time-ms dqm))
+    (try
+      (-> registry
+          (prometheus/set :http/thread-count (.getPoolSize ^ThreadPoolExecutor (t/thread-pool bounded-thread-pool)))
+          (prometheus/set :http/waiting-count (t/queue-size bounded-thread-pool)))
+      (when-some [dqm (:duration-queue-ms *context*)]
+        (prometheus/set registry :http/wait-time-ms dqm))
+      (catch Exception ex
+        (log/error ex "Error logging thread-pool metrics")))
     (f request)))
 
 (defn make-server-thread-pool [thread-count queue-size]
@@ -88,30 +92,31 @@
 ;; Extension and drop-in replacement for org.purefn.kurosawa.web.app/App
 ;; for consumption by the org.purefn.kurosawa.web.server namespace
 (defrecord InstrumentedApp
-  [registry config handler]
+           [prometheus config handler]
   component/Lifecycle
-  (start [this] (let [registry (:registry registry) ; get Iapetos registry
-                      {:keys [^long server/worker-threads
-                              ^long server/queue-capacity
-                              ^ExecutorService server/worker-pool]
-                       :or {worker-threads server/default-worker-threads
-                            queue-capacity server/default-queue-capacity}
-                       } config]
-                  (log/info "Starting InstrumentedApp")
-                  (if (some? worker-pool)
-                    this
+  (start [this] (if (::server/worker-pool this)
+                  this
+                  (let [registry (:registry prometheus) ; get Iapetos registry
+                        {:keys [^long server/worker-threads
+                                ^long server/queue-capacity]
+                         :or {worker-threads server/default-worker-threads
+                              queue-capacity server/default-queue-capacity}} config]
+                    (log/info "Starting InstrumentedApp")
                     (as-> (instrument registry handler worker-threads queue-capacity) $
-                      (update $ :handler vary-meta assoc :orig-handler handler) ; preserve original
+                      (assoc $ :orig-handler handler)  ; preserve original
+                      (set/rename-keys $ {:thread-pool ::server/worker-pool})
                       (merge this $)))))
-  (stop [this] (let [{:keys [^ExecutorService server/worker-pool]} config]
-                 (if (nil? worker-pool)
-                   this
-                   (do
-                     (.shutdownNow worker-pool) ; accept no new tasks, kill waiting tasks
-                     (-> this
-                         (assoc-in [:config :server/worker-pool] nil)
-                         (update :handler #(-> % meta :orig-handler))))))))
+  (stop [this] (if-some [worker-pool (::server/worker-pool this)]
+                 (let [{:keys [orig-handler]} this]
+                   (log/info "Stopping InstrumentedApp")
+                   (when (nil? orig-handler)
+                     (log/warn "Cannot find orig-handler when stopping InstrumentedApp"))
+                   (.shutdownNow worker-pool) ; accept no new tasks, kill waiting tasks
+                   (-> this
+                       (dissoc :orig-handler ::server/worker-pool)
+                       (assoc :handler (or orig-handler this))))
+                 this)))
 
 (defn make-instrumented-app
-  [config]
-  (->InstrumentedApp nil config nil))
+  [config handler]
+  (->InstrumentedApp nil config handler))

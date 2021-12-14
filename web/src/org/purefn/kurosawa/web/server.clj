@@ -89,7 +89,7 @@
                                                          ;; do not log 2xx status responses
                                                          "httpkit.server.status.processed.2"))
                                              (log/info event-name)))}
-                          (:config app)  ; instrumented app may have instrumented thread-pool
+                          (select-keys app [::worker-pool])  ; instrumented app may have instrumented thread-pool
                      config)
             serv-handle (->> {::worker-threads :thread
                               ::queue-capacity :queue-size
