@@ -9,7 +9,7 @@
             [preflex.resilient :as r]
             [preflex.type :as t]
             [com.stuartsierra.component :as component]
-            [org.purefn.kurosawa.web.app :as app]
+            [taoensso.timbre :as log]
             [org.purefn.kurosawa.web.server :as server])
   (:import [java.util.concurrent ExecutorService ThreadPoolExecutor]))
 
@@ -90,12 +90,14 @@
 (defrecord InstrumentedApp
   [registry config handler]
   component/Lifecycle
-  (start [this] (let [{:keys [^long server/worker-threads
+  (start [this] (let [registry (:registry registry) ; get Iapetos registry
+                      {:keys [^long server/worker-threads
                               ^long server/queue-capacity
                               ^ExecutorService server/worker-pool]
                        :or {worker-threads server/default-worker-threads
                             queue-capacity server/default-queue-capacity}
                        } config]
+                  (log/info "Starting InstrumentedApp")
                   (if (some? worker-pool)
                     this
                     (as-> (instrument registry handler worker-threads queue-capacity) $
