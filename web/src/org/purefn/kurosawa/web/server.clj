@@ -104,7 +104,7 @@
     (if server
       (do
         (log/info "Stopping HTTP-Kit web server on port" (::port config))
-        (httpkit-server/server-stop! (:server server))
+        (httpkit-server/server-stop! server)
         (assoc this :server nil))
       (do
         (log/info "HTTP-Kit web server not running")
