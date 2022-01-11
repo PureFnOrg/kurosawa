@@ -82,10 +82,13 @@
    You should use the returned thread-pool as the worker-pool in your web server."
   [registry handler thread-count queue-size]
   (let [{:keys [bounded-thread-pool
-                instrumented-thread-pool]} (make-server-thread-pool thread-count queue-size)
+                instrumented-thread-pool]
+         :as tmp} (make-server-thread-pool thread-count queue-size)
+        _ (log/info "instrument/" :tmp tmp)
         app-handler (-> handler
                         (wrap-queue-latency-middleware registry bounded-thread-pool))]
     {:handler app-handler
+     :bounded-thread-pool bounded-thread-pool
      :thread-pool instrumented-thread-pool}))
 
 ;;*************************************
@@ -101,7 +104,7 @@
                                 ^long server/queue-capacity]
                          :or {worker-threads server/default-worker-threads
                               queue-capacity server/default-queue-capacity}} config]
-                    (log/info "Starting InstrumentedApp")
+                    (log/info "Starting InstrumentedApp" :config config :worker-threads worker-threads)
                     (as-> (instrument registry handler worker-threads queue-capacity) $
                       (assoc $ :orig-handler handler)  ; preserve original
                       (set/rename-keys $ {:thread-pool ::server/worker-pool})

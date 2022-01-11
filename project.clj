@@ -31,7 +31,8 @@
                                    :url "http://www.apache.org/licenses/LICENSE-2.0"}
                          :url "https://github.com/PureFnOrg/kurosawa"
                          :deploy-repositories
-                         [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]]}
+                         [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]
+                          ["snapshots" {:url "https://clojars.org/repo/" :creds :gpg}]]}
 
              :versions {com.taoensso/timbre             "4.10.0"
                         com.stuartsierra/component      "0.3.2"
