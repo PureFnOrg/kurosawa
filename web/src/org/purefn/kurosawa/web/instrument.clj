@@ -59,8 +59,8 @@
 
 (defn make-server-thread-pool [thread-count queue-size]
   (let [bounded-pool (r/make-bounded-thread-pool thread-count queue-size)
-        task-invoker (fn [g context] (binding [*context* context]
-                                       (g)))
+        task-invoker (fn [g context-atom] (binding [*context* @context-atom]
+                                            (g)))
         instrumented (i/instrument-thread-pool
                       bounded-pool
                       (assoc i/shared-context-thread-pool-task-wrappers-millis
@@ -78,7 +78,7 @@
    |--------------|-------------------|
    | :handler     | Ring handler that log Prometheus metrics for the thread-pool  |
    | :thread-pool | Thread-pool that captures wait-time in the queue for requests |
-   
+
    You should use the returned thread-pool as the worker-pool in your web server."
   [registry handler thread-count queue-size]
   (let [{:keys [bounded-thread-pool
