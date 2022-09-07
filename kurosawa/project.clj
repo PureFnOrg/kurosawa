@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa "2.1.26-SNAPSHOT"
+(defproject org.purefn/kurosawa "2.1.26"
   :description "A catch-all project that brings in all Kurosawa libs."
   :plugins [[lein-modules "0.3.11"]]
   :packaging "pom"
