@@ -134,10 +134,10 @@
             {::keys [host port worker-threads]} config
             app-handle (app/app-handler app)
             serv-handle (jetty/run-jetty app-handle
-                                         {:join? false
-                                          :host host
-                                          :port port
-                                          :max-threads worker-threads})]
+                                         (cond-> {:join? false
+                                                  :host host
+                                                  :port port}
+                                           worker-threads (assoc :max-threads worker-threads)))]
         (assoc this :server serv-handle))))
 
   (stop [this]
