@@ -5,6 +5,7 @@
             [clojure.string :as string]
             [com.stuartsierra.component :as component]
             [org.httpkit.server :as httpkit-server]
+            [ring.adapter.jetty :as jetty]
             [immutant.web :as web]
             [org.purefn.kurosawa.log.api :as log-api]
             [org.purefn.kurosawa.log.core :as klog]
@@ -120,6 +121,45 @@
     (klog/add-component-appender :httpkit (log-api/log-namespaces this)
                                  (str dir "/httpkit.log"))))
 
+(defrecord JettyServer
+    [config app server]
+
+  component/Lifecycle
+  (start [this]
+    (if server
+      (do
+        (log/info "Jetty web server already started")
+        this)
+      (let [_ (log/info "Starting Jetty web server with" config)
+            {::keys [host port worker-threads]} config
+            app-handle (app/app-handler app)
+            serv-handle (jetty/run-jetty app-handle
+                                         {:join? false
+                                          :host host
+                                          :port port
+                                          :max-threads worker-threads})]
+        (assoc this :server serv-handle))))
+
+  (stop [this]
+    (if server
+      (do
+        (log/info "Stopping Jetty web server on port" (::port config))
+        (.stop server)
+        (.join server)
+        (assoc this :server nil))
+      (do
+        (log/info "Jetty web server not running")
+        this)))
+
+
+  ;;----------------------------------------------------------------------------
+  log-proto/Logging
+  (log-namespaces [_]
+    ["org.eclipse.jetty.*"])
+
+  (log-configure [this dir]
+    (klog/add-component-appender :jetty (log-api/log-namespaces this)
+                                 (str dir "/jetty.log"))))
 
 ;;------------------------------------------------------------------------------
 ;; Configuration
@@ -170,6 +210,20 @@
   ([config app]
    (->HttpkitServer config app nil)))
 
+(defn jetty-server
+  "Creates Jetty web server component from optional config and
+   optional app.
+
+   - `config`  Web server configuration. `::host` and `::port` are
+               required.
+   - `app`     If given, should be a Kurosawa app instance."
+  ([]
+   (jetty-server (default-config) nil))
+  ([config]
+   (jetty-server config nil))
+  ([config app]
+   (->JettyServer config app nil)))
+
 
 ;;------------------------------------------------------------------------------
 ;; Specs.
@@ -195,3 +249,9 @@
               :one-arg (s/cat :config ::config)
               :two-arg (s/cat :config ::config :app ::app))
   :ret (partial instance? HttpkitServer))
+
+(s/fdef jetty-server
+  :args (s/or :empty empty?
+              :one-arg (s/cat :config ::config)
+              :two-arg (s/cat :config ::config :app ::app))
+  :ret (partial instance? JettyServer))

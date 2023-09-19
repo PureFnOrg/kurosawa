@@ -1,7 +1,7 @@
-(defproject org.purefn/kurosawa.log "2.1.26"
+(defproject org.purefn/kurosawa.log "2.1.27-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "A Kurosawa library for logging."
-  :dependencies [[com.taoensso/timbre _]]
-  :profiles {:dev {:dependencies [[org.clojure/tools.namespace _]
-                                  [com.stuartsierra/component _]
-                                  [com.stuartsierra/component.repl _]]}})
+  :dependencies [[com.taoensso/timbre "4.10.0"]]
+  :profiles {:dev {:dependencies [[org.clojure/tools.namespace "0.2.11"]
+                                  [com.stuartsierra/component "0.3.2"]
+                                  [com.stuartsierra/component.repl "0.2.0"]]}})
