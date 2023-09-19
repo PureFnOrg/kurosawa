@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa "2.1.26"
+(defproject org.purefn/kurosawa "2.1.27"
   :description "Parent for all that is Kurosawa"
   :plugins [[lein-modules "0.3.11"]]
 
@@ -6,8 +6,8 @@
                                        ;; refactor-nrepl to start-up
                                        [org.clojure/clojure "1.10.0"]]}
 
-             :dev {:dependencies [[org.clojure/tools.namespace _]
-                                  [com.stuartsierra/component.repl _]]
+             :dev {:dependencies [[org.clojure/tools.namespace "1.1.0"]
+                                  [com.stuartsierra/component.repl "0.2.0"]]
                    :jvm-opts ["-Xmx2g"]
                    :source-paths ["dev"]
                    :codeina {:sources ["src"]
@@ -32,19 +32,7 @@
                          :url "https://github.com/PureFnOrg/kurosawa"
                          :deploy-repositories
                          [["releases" {:url "https://clojars.org/repo/" :creds :gpg}]
-                          ["snapshots" {:url "https://clojars.org/repo/" :creds :gpg}]]}
-
-             :versions {com.taoensso/timbre             "4.10.0"
-                        com.stuartsierra/component      "0.3.2"
-                        com.stuartsierra/component.repl "0.2.0"
-                        org.clojure/test.check          "0.9.0"
-                        com.gfredericks/test.chuck      "0.2.7"
-                        org.clojure/tools.namespace     "0.2.11"
-                        org.purefn/kurosawa.aws         :version
-                        org.purefn/kurosawa.log         :version
-                        org.purefn/kurosawa.core        :version
-                        org.purefn/kurosawa.web         :version
-                        org.purefn/kurosawa.nrepl       :version}}
+                          ["snapshots" {:url "https://clojars.org/repo/" :creds :gpg}]]}}
 
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version" "leiningen.release/bump-version" "release"]
