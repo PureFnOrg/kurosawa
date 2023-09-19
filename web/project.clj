@@ -11,7 +11,7 @@
                  [org.slf4j/log4j-over-slf4j "1.7.25"]
                  [com.fzakaria/slf4j-timbre "0.3.5"]
 
-                 [org.purefn/kurosawa.log "2.1.27-SNAPSHOT"]]
+                 [org.purefn/kurosawa.log "2.1.27"]]
 
   :profiles {:dev {:dependencies [[bidi "2.0.17"]
                                   [clj-commons/iapetos "0.1.9"]
