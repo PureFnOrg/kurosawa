@@ -3,6 +3,8 @@
   :description "The Kurosawa web library."
   :dependencies [[com.stuartsierra/component _]
 
+                 [ring/ring-core "1.10.0"]
+                 [ring/ring-jetty-adapter "1.10.0"]
                  [http-kit "2.5.3"]
                  [org.immutant/web "2.1.7"
                   :exclusions [ch.qos.logback/logback-classic]]
