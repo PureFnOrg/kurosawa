@@ -6,7 +6,8 @@
             [taoensso.timbre :as log]
             [taoensso.timbre.appenders.core :as append]
             [taoensso.timbre.appenders.3rd-party.rotor :as rotor]
-            [org.purefn.kurosawa.log.api :as api]))
+            [org.purefn.kurosawa.log.api :as api]
+            [org.purefn.kurosawa.log.datadog :as dd]))
 
 (def prod-dir
   "The root directory under which production log files are written."
@@ -87,7 +88,9 @@
                      :locale :jvm-default
                      :timezone (java.util.TimeZone/getTimeZone "America/New_York")}
     :output-fn output-fn
-    :appenders {:stdout (append/println-appender :stream :auto)
+    :appenders {:stdout (if dd/available?
+                          (dd/println-json-appender)
+                          (append/println-appender :stream :auto))
                 :all (rotor/rotor-appender {:path (str dir "/all.log")
                                             :max-size (* 8 1024 1024)
                                             :backlog 10})}}))

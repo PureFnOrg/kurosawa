@@ -1,4 +1,4 @@
-(defproject org.purefn/kurosawa.web "2.1.28"
+(defproject org.purefn/kurosawa.web "2.1.29-SNAPSHOT"
   :plugins [[lein-modules "0.3.11"]]
   :description "The Kurosawa web library."
   :dependencies [[com.stuartsierra/component "0.3.2"]
@@ -11,7 +11,7 @@
                  [org.slf4j/log4j-over-slf4j "1.7.25"]
                  [com.fzakaria/slf4j-timbre "0.3.5"]
 
-                 [org.purefn/kurosawa.log "2.1.28"]]
+                 [org.purefn/kurosawa.log "2.1.29-SNAPSHOT"]]
 
   :profiles {:dev {:dependencies [[bidi "2.0.17"]
                                   [clj-commons/iapetos "0.1.9"]
